@@ -1,5 +1,5 @@
 import React from 'react'
-import { Provider, createClient, connect } from '../lib'
+import { Provider, createClient, connect } from '../client'
 import test from 'ava'
 import renderer from 'react-test-renderer'
 

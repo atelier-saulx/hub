@@ -1,4 +1,4 @@
-import { createClient } from '../lib'
+import { createClient } from '../client'
 import test from 'ava'
 
 test('notifications', async t => {

@@ -1,7 +1,6 @@
-import { createClient } from '../lib'
+import { createClient } from '../client'
 import test from 'ava'
-import WebSocket from 'ws'
-import http from 'http'
+import { WebSocketServer } from '@clusterws/cws'
 
 let channelId = 0
 
@@ -47,10 +46,8 @@ const handleResponses = (data, ws) => {
   ws.send(JSON.stringify(initial))
 }
 
-test.only('rpc calls', async t => {
-  const server = http.createServer()
-  const wss = new WebSocket.Server({ server })
-  server.listen(9919)
+test('rpc calls', async t => {
+  const wss = new WebSocketServer({ port: 9919 })
   wss.on('connection', ws => {
     ws.on('message', message => {
       const incoming = JSON.parse(message)
