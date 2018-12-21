@@ -1,4 +1,11 @@
-const { WebSocket } = require('@clusterws/cws')
+var WebSocket
+
+// try {
+//   WebSocket = require('@clusterws/cws').WebSocket
+// } catch (e) {
+WebSocket = require('ws')
+// }
+
 const maxReconnectionTime = 3000
 
 const connect = (holder, socket, url, time = 0, reconnect = false) => {

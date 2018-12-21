@@ -10,26 +10,19 @@
     "update-test": "ava --update-snapshots"
   },
   "browser": {
-    "./lib/connection/websocket": "./lib/connection/websocket/browser.js",
-    "./lib/react/Head": "./lib/react/Head/browser.js",
-    "./lib/device": "./lib/device/browser.js"
+    "./client/connection/websocket": "./client/connection/websocket/browser.js",
+    "./client/react/Head": "./client/react/Head/browser.js",
+    "./client/device": "./client/device/browser.js"
   },
   "main": "client/index.js",
   "peerDependencies": {
     "react": "^16.3.2",
     "react-dom": "^16.2.0"
   },
-  "pre-commit": [
-    "format",
-    "lint"
-  ],
+  "pre-commit": ["format", "lint"],
   "eslintConfig": {
     "parser": "babel-eslint",
-    "extends": [
-      "standard",
-      "standard-react",
-      "prettier"
-    ],
+    "extends": ["standard", "standard-react", "prettier"],
     "rules": {
       "react/prop-types": 0
     }
@@ -56,15 +49,18 @@
     "eslint-plugin-standard": "^3.0.1",
     "pre-commit": "^1.2.2",
     "prettier": "^1.12.1",
+    "react-dom": "^16.4.1",
     "react-test-renderer": "^16.4.1",
     "standard": "^10.0.3"
   },
   "dependencies": {
+    "@clusterws/cws": "^0.9.0",
+    "murmurhash-native": "^3.2.4",
     "path-to-regexp": "^2.2.1",
     "prop-types": "^15.6.1",
+    "react": "^16.3.2",
     "string-hash": "^1.1.3",
     "vigour-ua": "^4.0.0",
-    "@clusterws/cws": "^0.9.0",
-    "murmurhash-native": "^3.2.4"
+    "ws": "^6.1.2"
   }
 }
