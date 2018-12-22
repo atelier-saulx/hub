@@ -32,7 +32,13 @@ const createServer = (port, endpoints) => {
 
     socket.on('message', msg => {
       const messages = JSON.parse(msg)
-      messages.forEach(msg => router(client, msg))
+      messages.forEach(msg => {
+        if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
+          client.close(msg.channel)
+        } else {
+          router(client, msg)
+        }
+      })
     })
 
     socket.on('close', (code, reason) => {

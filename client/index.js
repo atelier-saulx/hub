@@ -14,6 +14,8 @@ const renderHead = require('./react/Head/renderHead')
 const { device } = require('./device')
 const { close } = require('./close')
 const { deepNotEqual } = require('./util')
+const reset = require('./reset')
+
 var id = 0
 
 class Hub {
@@ -112,8 +114,7 @@ class Hub {
     return connectSocket(this, url)
   }
   reset(endpoint) {
-    console.log('reset not implemented yet....')
-    // this is a bit harder now since we mixed listeners with value
+    return reset(this, endpoint)
   }
 }
 
