@@ -7,7 +7,13 @@ const resetEndpoint = (hub, endpoint) => {
         const target = hub.store[endpoint][method][implementation]
         delete hub.store[endpoint][method][implementation]
         if (target.listeners) {
-          emit(hub, target.listeners, void 0, { hash: implementation }, target)
+          emit(
+            hub,
+            target.listeners,
+            void 0,
+            { hash: implementation },
+            target.v
+          )
         }
       }
     }
