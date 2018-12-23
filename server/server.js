@@ -7,11 +7,9 @@ const createServer = (port, endpoints) => {
       ? endpoints
       : (client, msg) => {
           const token = msg.user_jwt || msg.token || msg.jwt
-          if (token) {
-            if (client.token !== token) {
-              client.token = token
-              client.userInfo = false
-            }
+          if (client.token !== token) {
+            client.token = token
+            client.userInfo = false
           }
           const endpoint = endpoints[msg.endpoint]
           if (endpoint) {

@@ -1,18 +1,26 @@
 const { emit } = require('./emit')
+const { format } = require('./format')
 
 const resetEndpoint = (hub, endpoint) => {
   if (hub.store[endpoint]) {
     for (let method in hub.store[endpoint]) {
       for (let implementation in hub.store[endpoint][method]) {
-        const target = hub.store[endpoint][method][implementation]
-        delete hub.store[endpoint][method][implementation]
-        if (target.listeners) {
+        const store = hub.store[endpoint][method][implementation]
+        const v = store.v
+        store.v = void 0
+        store.checksum = void 0
+        if (store.listeners) {
           emit(
             hub,
-            target.listeners,
+            store.listeners,
             void 0,
-            { hash: implementation },
-            target.v
+            format(hub, {
+              hash: +implementation,
+              store: store,
+              endpoint,
+              method
+            }),
+            v
           )
         }
       }

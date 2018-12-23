@@ -22,15 +22,6 @@ const handleIncoming = (socket, data) => {
     }
     const props = socket.callbacks[seq].props
     if (props) {
-      if (data.error) {
-        // console.error(
-        //   `${props.endpoint}.${props.method} ${
-        //     props.args ? JSON.stringify(props.args, false, 2) : ''
-        //   }:`,
-        //   data.error
-        // )
-      }
-
       const sub = socket.subscriptions[props.hash]
       if (hasChannel && sub) {
         const channel = data.channel
@@ -210,6 +201,7 @@ class Socket extends Emitter {
     }
   }
   close(props) {
+    // console.log('close subs', props)
     const subs = this.subscriptions[props.hash]
     if (subs) {
       subs.cnt--
