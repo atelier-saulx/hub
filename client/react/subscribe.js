@@ -16,10 +16,13 @@ const subscribe = (component, props) => {
   if (subscription) {
     if (!Array.isArray(subscription)) {
       subsArray = [subscription]
-      component.nonParsedSubs = Object.assign({}, subscription)
+      component.nonParsedSubs =
+        typeof e === 'object' ? Object.assign({}, subscription) : subscription
     } else {
       subsArray = subscription
-      component.nonParsedSubs = subscription.map(e => Object.assign({}, e))
+      component.nonParsedSubs = subscription.map(e =>
+        typeof e === 'object' ? Object.assign({}, e) : e
+      )
     }
 
     const response = (component.response = [])

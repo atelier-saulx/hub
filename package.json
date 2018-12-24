@@ -14,22 +14,15 @@
     "./client/react/Head": "./client/react/Head/browser.js",
     "./client/device": "./client/device/browser.js"
   },
-  "main": "client/index.js",
+  "main": "./client/index.js",
   "peerDependencies": {
     "react": "^16.3.2",
     "react-dom": "^16.2.0"
   },
-  "pre-commit": [
-    "format",
-    "lint"
-  ],
+  "pre-commit": ["format", "lint"],
   "eslintConfig": {
     "parser": "babel-eslint",
-    "extends": [
-      "standard",
-      "standard-react",
-      "prettier"
-    ],
+    "extends": ["standard", "standard-react", "prettier"],
     "rules": {
       "react/prop-types": 0
     }
