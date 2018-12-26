@@ -76,7 +76,6 @@ class BaseComponent extends React.Component {
     return update
   }
   componentWillReceiveProps(next) {
-    console.log(next.subscription)
     if (next.subscription || typeof this.subscription === 'function') {
       const subscription = this.props.subscription || this.subscription
       const result =
@@ -124,8 +123,6 @@ BaseComponent.contextTypes = {
 exports.connect = (component, subscription) => {
   class FastComponent extends BaseComponent {
     render() {
-      console.log(this.props.subscription)
-
       return React.createElement(
         component,
         Object.assign(
