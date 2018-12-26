@@ -19,9 +19,8 @@ const deviceConfig = hub => {
     }
   }
   hub.configure(config)
-  if (global.location) {
+  if (global.location && global.history && global.history.pushState) {
     hub.on('device.history', (val, props) => {
-      console.log(global.location, '?')
       if (val !== global.location.pathname) {
         global.history.pushState({}, val, val)
       }
