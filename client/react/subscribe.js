@@ -3,6 +3,12 @@ const { internalRpc } = require('../rpc')
 const { parseData } = require('./data')
 const { close } = require('../close')
 
+const deepCopy = subscription => {
+  return typeof subscription === 'object'
+    ? Object.assign({}, subscription)
+    : subscription
+}
+
 const subscribe = (component, props) => {
   if (!props) props = component.props
   const hub = component.context.hub
@@ -16,13 +22,11 @@ const subscribe = (component, props) => {
   if (subscription) {
     if (!Array.isArray(subscription)) {
       subsArray = [subscription]
-      component.nonParsedSubs =
-        typeof e === 'object' ? Object.assign({}, subscription) : subscription
+
+      component.nonParsedSubs = deepCopy(subscription)
     } else {
       subsArray = subscription
-      component.nonParsedSubs = subscription.map(e =>
-        typeof e === 'object' ? Object.assign({}, e) : e
-      )
+      component.nonParsedSubs = subscription.map(deepCopy)
     }
 
     const response = (component.response = [])
@@ -35,7 +39,9 @@ const subscribe = (component, props) => {
       subsArray[i].listenening = false
       subsArray[i].onChange = component
       // dont fire here...
+
       internalRpc(hub, subsArray[i])
+
       response[i] = parseData(hub, subsArray[i])
     })
     // close
