@@ -2,9 +2,9 @@ class Endpoint {
   constructor() {
     this.subscriptions = new Map()
   }
-  emitListeners(type) {
+  emitListeners(type, payload) {
     if (this.listeners && this.listeners[type]) {
-      this.listeners[type].forEach(fn => fn(this))
+      this.listeners[type].forEach(fn => fn(this, payload))
     }
   }
   removeListener(type, cb) {

@@ -15,18 +15,24 @@ const fn = () => {
 }
 
 // subscribe
-client.rpc({
-  endpoint: 'f',
-  method: 'subscribe',
-  args: { uuid: 'firstname' }
-}, fn)
+client.rpc(
+  {
+    endpoint: 'f',
+    method: 'subscribe',
+    args: { uuid: 'firstname' }
+  },
+  fn
+)
 
-client.close({
-  endpoint: 'f',
-  method: 'subscribe',
-  args: { uuid: 'firstname' }
-}, fn)
+client.close(
+  {
+    endpoint: 'f',
+    method: 'subscribe',
+    args: { uuid: 'firstname' }
+  },
+  fn
+)
 
 // one off
-const result = await state.rpc('f.x', { hello: true})
+const result = await state.rpc('f.x', { hello: true })
 ```

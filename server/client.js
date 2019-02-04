@@ -54,7 +54,7 @@ class Client {
     this.channels.forEach(([endpoint, msg]) => {
       endpoint.subscriptions.delete(this)
       if (endpoint.listeners && endpoint.listeners.close) {
-        endpoint.emitListeners('close')
+        endpoint.emitListeners('close', this)
       }
     })
     this.channels.clear()
@@ -75,7 +75,7 @@ class Client {
         if (subs.length === 0) {
           endpoint.subscriptions.delete(this)
           if (endpoint.listeners && endpoint.listeners.close) {
-            endpoint.emitListeners('close')
+            endpoint.emitListeners('close', this)
           }
         }
       }
