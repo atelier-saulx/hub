@@ -21,7 +21,7 @@ const createServer = (port, endpoints, ua) => {
         }
 
   const server = new WebSocketServer({ port }, () => {
-    console.log('🤩  hub-server listening on port:', port)
+    console.log('💫  hub-server listening on port:', port)
   })
 
   server.on('connection', (socket, upgReq) => {
