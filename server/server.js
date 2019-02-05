@@ -1,7 +1,7 @@
 const { WebSocketServer } = require('@clusterws/cws')
 const Client = require('./client')
 
-const createServer = (port, endpoints) => {
+const createServer = (port, endpoints, ua) => {
   const router =
     typeof endpoints === 'function'
       ? endpoints
@@ -26,6 +26,14 @@ const createServer = (port, endpoints) => {
 
   server.on('connection', (socket, upgReq) => {
     const client = new Client(socket)
+
+    if (ua) {
+      const ua = upgReq.headers['user-agent']
+      if (ua) {
+        client.ua = ua
+      }
+    }
+
     client.address = socket._socket
 
     socket.on('message', msg => {

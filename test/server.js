@@ -43,9 +43,11 @@ test('server subscription', async t => {
 
   createServer({
     port: 9092,
+    ua: true,
     endpoints: {
       subscription: {
         cnt: (client, msg) => {
+          console.log(client.ua)
           client.subscribe(endpoint, msg)
         }
       }

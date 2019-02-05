@@ -1,5 +1,5 @@
 const Endpoint = require('./endpoint')
-const startServer = require('./server')
+const createServer = require('./server')
 const fs = require('fs')
 const path = require('path')
 
@@ -24,13 +24,13 @@ const createEndpoints = p => {
   return endpoints
 }
 
-exports.createServer = ({ port = 8080, endpoints = '' }) => {
+exports.createServer = ({ port = 8080, ua, endpoints = '' }) => {
   // require('path').dirname(require.main.filename)
   // if not endpoint
   if (typeof endpoints === 'string' || !endpoints) {
     endpoints = createEndpoints(endpoints)
   }
   if (endpoints) {
-    return startServer(port, endpoints)
+    return createServer(port, endpoints, ua)
   }
 }
