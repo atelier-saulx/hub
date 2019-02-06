@@ -59,9 +59,18 @@ class Client {
     })
     this.channels.clear()
   }
-  close(channel) {
-    // console.log('close channel!', channel)
-    const subscription = this.channels.get(channel)
+  close(channel, seq) {
+    let subscription
+    if (!channel && seq) {
+      for (let [, c] of this.channels) {
+        if (c[1].seq === seq) {
+          subscription = c
+          break
+        }
+      }
+    } else {
+      subscription = this.channels.get(channel)
+    }
     if (subscription) {
       const [endpoint, msg] = subscription
       const subs = endpoint.subscriptions.get(this)

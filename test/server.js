@@ -73,44 +73,43 @@ test('server subscription', async t => {
   t.pass()
 })
 
-test('server subscription (advanced)', async t => {
+test.only('server subscription unsubscribe', async t => {
   const endpoint = new Endpoint()
-
-  let cnt = 0
-  const timer = setInterval(() => {
-    endpoint.emit((endpoint, client, msg) => {
-      client.sendChannel(
-        {
-          content: cnt
-        },
-        msg,
-        endpoint
-      )
-    })
-  }, 10)
 
   createServer({
     port: 9093,
     endpoints: {
       subscription: {
         cnt: (client, msg) => {
-          console.log('subscribe')
           client.subscribe(endpoint, msg)
         }
       }
     }
   })
-
   const client = createClient({ url: 'ws://localhost:9093' })
-
   t.is(endpoint.subscriptions.size, 0)
 
   client.rpc('subscription.cnt', data => {})
-
   client.close('subscription.cnt')
-
   await wait(100)
+  t.is(endpoint.subscriptions.size, 0)
 
+  client.rpc('subscription.cnt', data => {})
+  await wait(50)
+  client.close('subscription.cnt')
+  await wait(100)
+  t.is(endpoint.subscriptions.size, 0)
+
+  client.rpc('subscription.cnt', data => {})
+  await wait(50)
+  client.close('subscription.cnt')
+  await wait(100)
+  t.is(endpoint.subscriptions.size, 0)
+
+  client.rpc('subscription.cnt', data => {})
+  await wait(100)
+  client.close('subscription.cnt')
+  await wait(100)
   t.is(endpoint.subscriptions.size, 0)
 
   t.pass()

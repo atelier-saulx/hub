@@ -182,12 +182,21 @@ class Socket extends Emitter {
       sendSubscription(this, true)
     }
   }
-  unsubscribe(subs) {
-    this.queue.push({
-      channel: subs.channel,
+  unsubscribe(subs, seq) {
+    const payload = {
       endpoint: 'channel',
       method: 'unsubscribe'
-    })
+    }
+
+    if (seq) {
+      payload.seq = seq
+    }
+
+    if (subs.channel) {
+      payload.channel = subs.channel
+    }
+
+    this.queue.push(payload)
     this.sendQueue()
   }
   closeAll(props) {
@@ -198,7 +207,18 @@ class Socket extends Emitter {
         this.unsubscribe(subs)
       } else if (subs.inProgress) {
         delete this.callbacks[subs.inProgress]
-        this.unsubscribe(subs)
+        let removed
+        for (let i = 0, l = this.queue.length; i < l; i++) {
+          const q = this.queue[i]
+          if (q.seq === subs.inProgress) {
+            removed = true
+            this.queue.splice(i, 1)
+            break
+          }
+        }
+        if (!removed) {
+          this.unsubscribe(subs, subs.inProgress)
+        }
       }
       delete this.subscriptions[props.hash]
     }

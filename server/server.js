@@ -40,7 +40,7 @@ const createServer = (port, endpoints, ua) => {
       const messages = JSON.parse(msg)
       messages.forEach(msg => {
         if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
-          client.close(msg.channel)
+          client.close(msg.channel, msg.seq)
         } else {
           router(client, msg)
         }
