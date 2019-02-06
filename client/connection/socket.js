@@ -182,26 +182,23 @@ class Socket extends Emitter {
       sendSubscription(this, true)
     }
   }
+  unsubscribe(subs) {
+    this.queue.push({
+      channel: subs.channel,
+      endpoint: 'channel',
+      method: 'unsubscribe'
+    })
+    this.sendQueue()
+  }
   closeAll(props) {
     const subs = this.subscriptions[props.hash]
     if (subs) {
       if (this.connected && subs.channel && this.channels[subs.channel]) {
         delete this.channels[subs.channel]
-        // this really has to be changed...
-        this.queue.push({
-          channel: subs.channel,
-          endpoint: 'channel',
-          method: 'unsubscribe'
-        })
-        this.sendQueue()
+        this.unsubscribe(subs)
       } else if (subs.inProgress) {
         delete this.callbacks[subs.inProgress]
-        this.queue.push({
-          channel: subs.channel,
-          endpoint: 'channel',
-          method: 'unsubscribe'
-        })
-        this.sendQueue()
+        this.unsubscribe(subs)
       }
       delete this.subscriptions[props.hash]
     }
