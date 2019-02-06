@@ -196,6 +196,12 @@ class Socket extends Emitter {
         this.sendQueue()
       } else if (subs.inProgress) {
         delete this.callbacks[subs.inProgress]
+        this.queue.push({
+          channel: subs.channel,
+          endpoint: 'channel',
+          method: 'unsubscribe'
+        })
+        this.sendQueue()
       }
       delete this.subscriptions[props.hash]
     }
