@@ -8,6 +8,7 @@ exports.Endpoint = Endpoint
 const createEndpoints = p => {
   const endpoints = {}
   p = p || path.join(path.dirname(require.main.filename), 'endpoints')
+  console.log(p)
   try {
     const files = fs.readdirSync(p)
     files.forEach(endpoint => {
@@ -18,8 +19,8 @@ const createEndpoints = p => {
         endpoints[endpoint][method] = require(path.join(p, endpoint, method))
       })
     })
-  } catch (e) {
-    console.warn('no endpoints found')
+  } catch (err) {
+    console.error(`Problem with endpoints "${err.message}"`)
   }
   return endpoints
 }
