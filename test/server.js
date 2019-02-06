@@ -73,11 +73,16 @@ test('server subscription', async t => {
   t.pass()
 })
 
-test.only('server subscription unsubscribe', async t => {
+test('server subscription unsubscribe', async t => {
   const endpoint = new Endpoint()
+  var cnt = 0
+  endpoint.on('close', () => {
+    // console.log('CLOSE!')
+    cnt++
+  })
 
   createServer({
-    port: 9093,
+    port: 9095,
     endpoints: {
       subscription: {
         cnt: (client, msg) => {
@@ -86,7 +91,7 @@ test.only('server subscription unsubscribe', async t => {
       }
     }
   })
-  const client = createClient({ url: 'ws://localhost:9093' })
+  const client = createClient({ url: 'ws://localhost:9095' })
   t.is(endpoint.subscriptions.size, 0)
 
   client.rpc('subscription.cnt', data => {})
@@ -111,6 +116,14 @@ test.only('server subscription unsubscribe', async t => {
   client.close('subscription.cnt')
   await wait(100)
   t.is(endpoint.subscriptions.size, 0)
+
+  client.rpc('subscription.cnt', data => {})
+  await wait(100)
+  client.close('subscription.cnt')
+  await wait(100)
+  t.is(endpoint.subscriptions.size, 0)
+
+  t.true(cnt > 0, 'fired close more then once')
 
   t.pass()
 })

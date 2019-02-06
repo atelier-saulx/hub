@@ -10,6 +10,9 @@ class Endpoint {
   removeListener(type, cb) {
     console.log('removeListener not implemented yet..')
   }
+  remove() {
+    // if exithook REMOVE
+  }
   on(type, cb) {
     if (!this.listeners) {
       this.listeners = {}

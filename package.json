@@ -6,7 +6,7 @@
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
     "test": "ava --verbose",
-    "watch": "ava --verbose --watch test/server.js",
+    "watch": "ava --verbose --watch",
     "update-test": "ava --update-snapshots"
   },
   "browser": {
