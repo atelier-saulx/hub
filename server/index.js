@@ -8,17 +8,18 @@ exports.Endpoint = Endpoint
 const createEndpoints = p => {
   const endpoints = {}
   p = p || path.join(path.dirname(require.main.filename), 'endpoints')
-  console.log(p)
   try {
     const files = fs.readdirSync(p)
-    files.forEach(endpoint => {
-      const methods = fs.readdirSync(path.join(p, endpoint))
-      endpoints[endpoint] = {}
-      methods.forEach(method => {
-        method = method.replace(/\.js$/, '')
-        endpoints[endpoint][method] = require(path.join(p, endpoint, method))
+    files
+      .filter(file => file[0] !== '.')
+      .forEach(endpoint => {
+        const methods = fs.readdirSync(path.join(p, endpoint))
+        endpoints[endpoint] = {}
+        methods.forEach(method => {
+          method = method.replace(/\.js$/, '')
+          endpoints[endpoint][method] = require(path.join(p, endpoint, method))
+        })
       })
-    })
   } catch (err) {
     console.error(`Problem with endpoints "${err.message}"`)
   }
