@@ -140,7 +140,9 @@ class Socket extends Emitter {
   }
   changeUrl(url) {
     this.connection.closed = true
-    this.connection.ws.close()
+    if (this.connection.ws) {
+      this.connection.ws.close()
+    }
     this.connected = false
     close(this)
     this.url = url
