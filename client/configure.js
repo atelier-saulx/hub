@@ -10,6 +10,12 @@ const configure = (hub, config) => {
     delete config.url
   }
 
+  if (config.browser) {
+    hub.isNode = false
+  } else {
+    hub.isNode = typeof window === 'undefined'
+  }
+
   if (config.global) {
     const globalSettings = config.global
     if (globalSettings.on) {

@@ -4,7 +4,9 @@ import test from 'ava'
 import renderer from 'react-test-renderer'
 
 test('.on advanced', t => {
-  const client = createClient()
+  const client = createClient({
+    browser: true
+  })
   let fired = { meth1: 0, meth2: 0 }
 
   // same config for both meth1 and meth2
@@ -60,7 +62,9 @@ test('.on advanced', t => {
 })
 
 test('configure .on option and render', async t => {
-  const client = createClient()
+  const client = createClient({
+    browser: true
+  })
   var receiveCnt = 0
 
   client.configure({
@@ -103,7 +107,9 @@ test('configure .on option and render', async t => {
 })
 
 test('unsubscribe', async t => {
-  const client = createClient()
+  const client = createClient({
+    browser: true
+  })
 
   client.configure({
     device: {

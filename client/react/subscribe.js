@@ -40,7 +40,9 @@ const subscribe = (component, props) => {
       subsArray[i].onChange = component
       // dont fire here...
 
-      internalRpc(hub, subsArray[i])
+      if (!hub.isNode) {
+        internalRpc(hub, subsArray[i])
+      }
 
       response[i] = parseData(hub, subsArray[i])
     })
