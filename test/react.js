@@ -7,6 +7,7 @@ test('.on advanced', t => {
   const client = createClient({
     browser: true
   })
+
   let fired = { meth1: 0, meth2: 0 }
 
   // same config for both meth1 and meth2

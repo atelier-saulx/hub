@@ -1,12 +1,12 @@
 {
   "name": "hub",
   "description": "Front end state management",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "scripts": {
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
     "test": "ava --verbose",
-    "watch": "ava **/reactSSR.js --verbose --watch",
+    "watch": "ava --verbose --watch",
     "update-test": "ava --update-snapshots"
   },
   "browser": {

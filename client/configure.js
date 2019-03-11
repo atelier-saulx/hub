@@ -10,7 +10,7 @@ const configure = (hub, config) => {
     delete config.url
   }
 
-  if (config.browser) {
+  if (config.browser || (config.browser !== false && hub.isNode == false)) {
     hub.isNode = false
   } else {
     hub.isNode = typeof window === 'undefined'

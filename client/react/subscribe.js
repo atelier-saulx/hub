@@ -39,7 +39,6 @@ const subscribe = (component, props) => {
       subsArray[i].listenening = false
       subsArray[i].onChange = component
       // dont fire here...
-
       if (!hub.isNode) {
         internalRpc(hub, subsArray[i])
       }
