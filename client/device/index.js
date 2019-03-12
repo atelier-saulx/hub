@@ -20,10 +20,15 @@ const deviceConfig = hub => {
     }
   }
 
-  hub.setServerRequest = req => {
+  hub.setServerRequest = (req, parsedUa) => {
+    /*
+      parsed ua is in the format of { device, platform, browser, version }
+    */
     if (req) {
       hub.set('device.history', req.url)
-      if (req.headers && req.headers['user-agent']) {
+      if (parsedUa) {
+        hub.set('device.type', parsedUa)
+      } else if (req.headers && req.headers['user-agent']) {
         hub.set('device.type', ua(req.headers['user-agent']))
       }
     }

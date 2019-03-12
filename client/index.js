@@ -22,7 +22,7 @@ class Hub {
   constructor(config) {
     this.id = ++id
     this.store = {}
-    device(this)
+    device(this, config)
     if (config) configure(this, config)
   }
   is(props, args, check) {

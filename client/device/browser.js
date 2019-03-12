@@ -1,7 +1,22 @@
-const { device, platform, browser, version } = require('vigour-ua/navigator')
 const notifications = require('./notifications')
 
-const deviceConfig = hub => {
+const deviceConfig = (hub, conf) => {
+  /*
+    parsed ua is in the format of { device, platform, browser }
+  */
+  const parsedUa = conf.ua || {
+    device: 'dekstop',
+    platform: 'mac',
+    browser: 'chrome',
+    version: 70
+  }
+
+  if (!conf.ua) {
+    console.log(
+      'You may want to add a parsed user agent to the hub configuration'
+    )
+  }
+
   const config = {
     device: {
       send: false,
@@ -9,12 +24,7 @@ const deviceConfig = hub => {
         default: global.location ? global.location.pathname : ''
       },
       type: {
-        default: {
-          device,
-          platform,
-          browser,
-          version
-        }
+        default: parsedUa
       }
     }
   }
