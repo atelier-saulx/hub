@@ -4,7 +4,7 @@ const stringHash = require('string-hash')
 const fields = ['send', 'call', 'receive', 'args', 'on', 'onChange', 'default']
 
 const config = (hub, result) => {
-  const config = hub.config
+  const config = hub._config
   if (config) {
     const { endpoint, method } = result
     const e = config[endpoint]

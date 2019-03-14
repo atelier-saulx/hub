@@ -33,10 +33,10 @@ const configure = (hub, config) => {
     hub.globalSettings = globalSettings
   }
 
-  if (hub.config) {
-    mergeObj(config, hub.config)
+  if (hub._config) {
+    mergeObj(config, hub._config)
   } else {
-    hub.config = config
+    hub._config = config
   }
 }
 
