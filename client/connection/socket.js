@@ -226,7 +226,6 @@ class Socket extends Emitter {
     }
   }
   close(props) {
-    // console.log('close subs', props)
     const subs = this.subscriptions[props.hash]
     if (subs) {
       subs.cnt--

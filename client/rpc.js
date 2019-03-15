@@ -93,8 +93,7 @@ const internalRpc = (hub, props) => {
 
 const rpc = (hub, props) => {
   // promise returns async generator if its a subscription
-
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     // will not be resolve in between value - if channel then
     props.ready = resolve
     internalRpc(hub, props)

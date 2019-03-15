@@ -87,6 +87,7 @@ test('server subscription unsubscribe', async t => {
       subscription: {
         cnt: (client, msg) => {
           client.subscribe(endpoint, msg)
+          client.sendChannel({ content: cnt }, msg)
         }
       }
     }
@@ -122,8 +123,12 @@ test('server subscription unsubscribe', async t => {
   client.close('subscription.cnt')
   await wait(100)
   t.is(endpoint.subscriptions.size, 0)
-
   t.true(cnt > 0, 'fired close more then once')
+
+  const r = await client.rpc('subscription.cnt')
+  t.is(r, 4)
+  await wait(100)
+  t.is(endpoint.subscriptions.size, 0)
 
   t.pass()
 })

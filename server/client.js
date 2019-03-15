@@ -39,7 +39,7 @@ class Client {
     payload.seq = msg.seq
     this.sendSocket(payload)
   }
-  sendChannel(payload, msg, endpoint) {
+  sendChannel(payload, msg) {
     if (msg.channel) {
       payload.channel = msg.channel
       this.sendSocket(payload)
@@ -49,9 +49,12 @@ class Client {
       payload.seq = msg.seq
       this.sendSocket(payload)
     }
+    if (msg.noSubscription) {
+      this.close(msg.channel, msg.seq)
+    }
   }
   closeAll() {
-    this.channels.forEach(([endpoint, msg]) => {
+    this.channels.forEach(([endpoint]) => {
       endpoint.subscriptions.delete(this)
       if (endpoint.listeners && endpoint.listeners.close) {
         endpoint.emitListeners('close', this)
