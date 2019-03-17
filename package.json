@@ -1,7 +1,7 @@
 {
   "name": "hub",
   "description": "Front end state management",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "scripts": {
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
