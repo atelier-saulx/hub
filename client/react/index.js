@@ -120,7 +120,31 @@ BaseComponent.contextTypes = {
   hub: PropTypes.object
 }
 
+class OnlyConnect extends React.Component {}
+
+OnlyConnect.contextTypes = {
+  hub: PropTypes.object
+}
+
 exports.connect = (component, subscription) => {
+  if (!subscription) {
+    return class extends OnlyConnect {
+      render() {
+        return React.createElement(
+          component,
+          Object.assign(
+            {
+              hub: this.context.hub
+            },
+            this.props
+          )
+        )
+      }
+    }
+  }
+  if (subscription === true) {
+    subscription = undefined
+  }
   class FastComponent extends BaseComponent {
     render() {
       return React.createElement(
