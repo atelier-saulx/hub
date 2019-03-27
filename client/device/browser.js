@@ -17,11 +17,17 @@ const deviceConfig = (hub, conf) => {
     )
   }
 
+  const location = () => {
+    return global.location
+      ? global.location.href.replace(global.location.origin)
+      : ''
+  }
+
   const config = {
     device: {
       send: false,
       history: {
-        default: global.location ? global.location.pathname : ''
+        default: location()
       },
       type: {
         default: parsedUa
@@ -30,14 +36,13 @@ const deviceConfig = (hub, conf) => {
   }
   hub.configure(config)
   if (global.location && global.history && global.history.pushState) {
-    hub.on('device.history', (val, props) => {
-      if (val !== global.location.pathname) {
+    hub.on('device.history', val => {
+      if (val !== location()) {
         global.history.pushState({}, val, val)
       }
     })
     global.addEventListener('popstate', () => {
-      console.log('???')
-      hub.set('device.history', global.location.pathname)
+      hub.set('device.history', location())
     })
   }
   notifications(hub)
