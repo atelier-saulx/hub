@@ -1,5 +1,5 @@
 import React from 'react'
-import { Provider, createClient, connect } from '../client'
+import { Provider, createClient, connect, Switch, Route } from '../client'
 import test from 'ava'
 import renderer from 'react-test-renderer'
 
@@ -158,4 +158,31 @@ test('unsubscribe', async t => {
   t.falsy(cats.listeners)
 
   t.pass()
+})
+
+// path="/layout/:type/:id" component={Layout}
+
+test('router', t => {
+  const client = createClient({
+    browser: true
+  })
+
+  const Thing = () => {
+    return React.createElement(Switch, {}, [
+      React.createElement(Route, {
+        path: '/:id/'
+      })
+    ])
+  }
+
+  const App = () => {
+    return React.createElement(
+      Provider,
+      { hub: client },
+      React.createElement(Thing)
+    )
+  }
+
+  const tree = renderer.create(React.createElement(App))
+  t.snapshot(tree.toJSON())
 })
