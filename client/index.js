@@ -82,6 +82,12 @@ class Hub {
     props = format(this, props)
     return mergeLocal(this, props, value, immediate)
   }
+  checksum(props, args) {
+    const store = this.getStore(props, args)
+    if (store) {
+      return store.checksum
+    }
+  }
   on(props, fn, cb) {
     if (typeof fn === 'object') {
       props = format(this, props, fn)
