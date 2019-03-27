@@ -36,6 +36,7 @@ const deviceConfig = (hub, conf) => {
       }
     })
     global.addEventListener('popstate', () => {
+      console.log('???')
       hub.set('device.history', global.location.pathname)
     })
   }

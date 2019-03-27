@@ -1,7 +1,7 @@
 const React = require('react')
 const { connect } = require('./index')
 const PropTypes = require('prop-types')
-
+const qs = require('query-string')
 // adds 3kb to project
 const pathToRegexp = require('path-to-regexp')
 
@@ -87,13 +87,23 @@ class Route extends React.Component {
         keys
       }
     }
+
     const matched = parsed[path].re.exec(data)
-    const match = matched && {
-      params: parsed[path].keys.reduce((params, { name }, index) => {
-        params[name] = matched[index + 1]
-        return params
-      }, {})
+    let match
+    if (matched) {
+      const hasQuery = /\?.{1,500}$/.test(data)
+      const q = hasQuery && data.split('?')[1]
+      match = {
+        params: parsed[path].keys.reduce((params, { name }, index) => {
+          params[name] = hasQuery
+            ? matched[index + 1].split('?')[0]
+            : matched[index + 1]
+          return params
+        }, {})
+      }
+      match.query = qs.parse(q)
     }
+
     if (match) {
       if (switchState) {
         switchState.selected = path
