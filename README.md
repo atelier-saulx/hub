@@ -6,7 +6,7 @@ Front end react state management.
 Grpc build in over websockets
 
 ```javascript
-import { createClient } from 'hub'
+import { createClient } from '@saulx/hub'
 
 const client = createClient()
 
