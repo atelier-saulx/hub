@@ -168,10 +168,9 @@ test('router', t => {
   })
 
   const Thing = () => {
-    return React.createElement(
-      Switch,
-      {},
+    return React.createElement(Switch, {}, [
       React.createElement(Route, {
+        key: 0,
         path: '/:id',
         component: ({ match }) => {
           return React.createElement(
@@ -181,7 +180,7 @@ test('router', t => {
           )
         }
       })
-    )
+    ])
   }
 
   client.set('device.history', '/hello?type=yes')

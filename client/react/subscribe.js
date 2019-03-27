@@ -22,15 +22,12 @@ const subscribe = (component, props) => {
   if (subscription) {
     if (!Array.isArray(subscription)) {
       subsArray = [subscription]
-
       component.nonParsedSubs = deepCopy(subscription)
     } else {
       subsArray = subscription
       component.nonParsedSubs = subscription.map(deepCopy)
     }
-
     const response = (component.response = [])
-
     subsArray.forEach((val, i) => {
       if (typeof val !== 'object' || !val.hash || val.call) {
         subsArray[i] = format(hub, val)
@@ -38,14 +35,11 @@ const subscribe = (component, props) => {
       subsArray[i].isSubscriber = true
       subsArray[i].listenening = false
       subsArray[i].onChange = component
-      // dont fire here...
       if (!hub.isNode) {
         internalRpc(hub, subsArray[i])
       }
-
       response[i] = parseData(hub, subsArray[i])
     })
-    // close
     component.parsedSubscriptions = subsArray
   }
 }

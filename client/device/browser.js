@@ -17,11 +17,10 @@ const deviceConfig = (hub, conf) => {
     )
   }
 
-  const location = () => {
-    return global.location
-      ? global.location.href.replace(global.location.origin)
+  const location = () =>
+    global.location
+      ? global.location.href.replace(global.location.origin, '')
       : ''
-  }
 
   const config = {
     device: {
