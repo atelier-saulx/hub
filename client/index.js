@@ -89,7 +89,13 @@ class Hub {
     }
   }
   on(props, fn, cb) {
-    if (typeof fn === 'object') {
+    if (props === 'connection') {
+      if (this.socket) {
+        this.socket.on('open', () => fn(true))
+        this.socket.on('close', () => fn(false))
+      }
+      return
+    } else if (typeof fn === 'object') {
       props = format(this, props, fn)
       fn = cb
     } else {

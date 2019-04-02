@@ -80,7 +80,6 @@ test('server subscription unsubscribe', async t => {
     // console.log('CLOSE!')
     cnt++
   })
-
   createServer({
     port: 9095,
     endpoints: {
@@ -130,5 +129,41 @@ test('server subscription unsubscribe', async t => {
   await wait(100)
   t.is(endpoint.subscriptions.size, 0)
 
+  t.pass()
+})
+
+test.only('server checksum', async t => {
+  const endpoint = new Endpoint()
+  var cnt = 1
+  var received = 0
+  const checksum = []
+  createServer({
+    port: 9096,
+    endpoints: {
+      subscription: {
+        cnt: (client, msg) => {
+          client.subscribe(endpoint, msg)
+          checksum.push(msg.checksum)
+          if (msg.checksum !== cnt) {
+            client.sendChannel({ content: cnt, checksum: cnt }, msg, endpoint)
+          }
+        }
+      }
+    }
+  })
+  const client = createClient({ url: 'ws://localhost:9096' })
+  client.rpc('subscription.cnt', data => {
+    received++
+  })
+  await wait(100)
+  t.is(client.checksum('subscription.cnt'), 1)
+  client.close('subscription.cnt')
+  await wait(100)
+  client.rpc('subscription.cnt', data => {
+    received++
+  })
+  await wait(100)
+  t.is(received, 1)
+  t.deepEqual(checksum, [undefined, 1])
   t.pass()
 })
