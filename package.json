@@ -16,8 +16,8 @@
   },
   "main": "./client/index.js",
   "peerDependencies": {
-    "react": "^16.3.2",
-    "react-dom": "^16.2.0"
+    "react": "^16.8.0",
+    "react-dom": "^16.8.6"
   },
   "pre-commit": [
     "format",
