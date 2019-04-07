@@ -7,7 +7,7 @@ const { on, removeListener, removeComponentListener } = require('./listeners')
 const { emit, emitImmediate } = require('./emit')
 const { getLocal } = require('./getLocal')
 const { getStore } = require('./getStore')
-const { Provider, connect } = require('./react')
+const { Provider: ProviderLegacy, connect } = require('./react')
 const { Switch, Route, Link } = require('./react/router')
 const Head = require('./react/Head')
 const renderHead = require('./react/Head/renderHead')
@@ -15,6 +15,7 @@ const { device } = require('./device')
 const { close } = require('./close')
 const { deepNotEqual } = require('./util')
 const reset = require('./reset')
+const { useHub, useRpc, Provider } = require('./react/hooks')
 
 var id = 0
 
@@ -130,7 +131,10 @@ class Hub {
   }
 }
 
+exports.useHub = useHub
+exports.useRpc = useRpc
 exports.Provider = Provider
+exports.ProviderLegacy = ProviderLegacy
 exports.connect = connect
 exports.Switch = Switch
 exports.Route = Route

@@ -8,21 +8,29 @@ exports.on = (hub, props, fn) => {
   listeners.fn.push(fn)
 }
 
-const removeOnListeners = (hub, props) => {
-  if (props._onListener) {
-    props._onParsed.forEach(val => {
-      removeListener(hub, val, props._onListener)
-    })
+exports.onSet = (hub, props, fn) => {
+  const store = props.store
+  let listeners = store.listeners
+  if (!listeners) {
+    listeners = store.listeners = {}
   }
+  if (!listeners.fnSet) listeners.fnSet = new Set()
+  listeners.fnSet.add(fn)
+}
+
+const removeOnListeners = (hub, props) => {
+  props._onParsed.forEach(val => {
+    removeListener(hub, val, props._onListener)
+  })
 }
 
 const removeListener = (hub, props, fn) => {
   const store = props.store
   const listeners = store.listeners
   const fnStore = listeners && listeners.fn
-  removeOnListeners(hub, props)
-  // props.on
-
+  if (props._onListener) {
+    removeOnListeners(hub, props)
+  }
   if (fnStore) {
     if (fn) {
       for (let i = 0, len = fnStore.length; i < len; i++) {
@@ -30,7 +38,7 @@ const removeListener = (hub, props, fn) => {
           fnStore.splice(i, 1)
           if (fnStore.length === 0) {
             delete listeners.fn
-            if (!listeners.components) {
+            if (!listeners.components && !listeners.fnSet) {
               listeners.removed = true
               delete store.listeners
             }
@@ -40,7 +48,7 @@ const removeListener = (hub, props, fn) => {
       }
     } else {
       delete listeners.fn
-      if (!listeners.components) {
+      if (!listeners.components && !listeners.fnSet) {
         listeners.removed = true
         delete store.listeners
       }
@@ -50,6 +58,38 @@ const removeListener = (hub, props, fn) => {
 }
 
 exports.removeListener = removeListener
+
+const removeSetListener = (hub, props, fn) => {
+  const store = props.store
+  const listeners = store.listeners
+  const fnSet = listeners && listeners.fnSet
+  if (props._onListener) {
+    removeOnListeners(hub, props)
+  }
+  if (fnSet) {
+    if (fn) {
+      fnSet.delete(fn)
+      if (fnSet.size === 0) {
+        if (!listeners.components && !listeners.fn) {
+          listeners.removed = true
+          delete store.listeners
+        } else {
+          delete store.fnSet
+        }
+      }
+      return true
+    } else {
+      delete listeners.fnSet
+      if (!listeners.components && !listeners.fn) {
+        listeners.removed = true
+        delete store.listeners
+      }
+      return true
+    }
+  }
+}
+
+exports.removeSetListener = removeSetListener
 
 exports.onComponent = (hub, props, component) => {
   const store = props.store
@@ -68,7 +108,9 @@ exports.removeComponentListener = (hub, props, component) => {
   const store = props.store
   const listeners = store.listeners
   const componentStore = listeners && listeners.components
-  removeOnListeners(hub, props)
+  if (props._onListener) {
+    removeOnListeners(hub, props)
+  }
 
   if (componentStore) {
     if (component) {
@@ -80,7 +122,7 @@ exports.removeComponentListener = (hub, props, component) => {
           componentStore.length--
           if (componentStore.length === 0) {
             delete listeners.components
-            if (!listeners.fn) {
+            if (!listeners.fn && !listeners.fnSet) {
               listeners.removed = true
               delete store.listeners
             }
@@ -90,7 +132,7 @@ exports.removeComponentListener = (hub, props, component) => {
       }
     } else {
       delete listeners.components
-      if (!listeners.fn) {
+      if (!listeners.fn && !listeners.fnSet) {
         listeners.removed = true
         delete store.listeners
       }

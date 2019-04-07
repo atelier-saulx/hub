@@ -18,7 +18,6 @@ const subscribe = (component, props) => {
   if (typeof subscription === 'function') {
     subscription = subscription(component.props, hub)
   }
-
   if (subscription) {
     if (!Array.isArray(subscription)) {
       subsArray = [subscription]

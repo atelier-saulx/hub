@@ -2,7 +2,7 @@ const { setLocal, mergeLocal } = require('./setLocal')
 const { emit } = require('./emit')
 const { close } = require('./close')
 const { format } = require('./format')
-const { on, onComponent } = require('./listeners')
+const { on, onComponent, onSet } = require('./listeners')
 const { getLocal } = require('./getLocal')
 
 const defaultSend = (hub, props, receive) => {
@@ -76,7 +76,9 @@ const internalRpc = (hub, props) => {
     if (props.on) {
       onSubscription(hub, props)
     }
-    if (typeof listener === 'object') {
+    if (props.fromHook) {
+      onSet(hub, props, listener)
+    } else if (typeof listener === 'object') {
       onComponent(hub, props, listener)
     } else {
       on(hub, props, listener)

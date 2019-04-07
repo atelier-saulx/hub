@@ -26,8 +26,14 @@ const emitFn = (arr, val, props, prev) => {
 
 const emitImmediate = (hub, listeners, val, props, prev) => {
   const fn = listeners.fn
+  const fnSet = listeners.fnSet
   if (fn) {
     emitFn(fn, val, props, prev)
+  }
+  if (fnSet) {
+    for (let func of fnSet) {
+      func(val)
+    }
   }
   const components = listeners.components
   if (components) {
@@ -56,8 +62,14 @@ const emit =
           cnt--
           if (listeners.removed) return
           const fn = listeners.fn
+          const fnSet = listeners.fnSet
+
+          if (fnSet) {
+            for (let func of fnSet) {
+              func(val)
+            }
+          }
           if (fn) {
-            // cant use forEach prob...
             emitFn(fn, val, props, prev)
           }
           const components = listeners.components

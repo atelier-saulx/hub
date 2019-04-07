@@ -1,7 +1,7 @@
 // only syntax sugar + config reading
 const { getStore } = require('./getStore')
-const stringHash = require('string-hash')
 const fields = ['send', 'call', 'receive', 'args', 'on', 'onChange', 'default']
+const { hash } = require('./hash')
 
 const config = (hub, result) => {
   const config = hub._config
@@ -26,17 +26,7 @@ const config = (hub, result) => {
   return result
 }
 
-const hash = props => {
-  if (props.args === void 0) {
-    props.hash = stringHash(props.endpoint + props.method)
-  } else {
-    props.hash = stringHash(
-      props.endpoint + props.method + JSON.stringify(props.args)
-    )
-  }
-}
-
-const format = (hub, props, args, cb) => {
+const format = (hub, props, args, cb, hashed) => {
   var result
   if (typeof props === 'string') {
     const split = props.split('.')
@@ -46,7 +36,6 @@ const format = (hub, props, args, cb) => {
   } else {
     result = props
   }
-
   if (args !== void 0) {
     if (cb) {
       result.args = args
@@ -81,7 +70,7 @@ const format = (hub, props, args, cb) => {
   }
 
   if (!result.hash) {
-    hash(result)
+    result.hash = hashed || hash(result)
   }
 
   if (!result.store) {

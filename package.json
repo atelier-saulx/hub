@@ -7,7 +7,8 @@
     "lint": "eslint '{lib,test}/**/*.js' --fix",
     "test": "ava --verbose",
     "watch": "ava --verbose --watch",
-    "update-test": "ava --update-snapshots"
+    "update-test": "ava --update-snapshots",
+    "browser": "aristotle browserTest"
   },
   "browser": {
     "./client/connection/websocket": "./client/connection/websocket/browser.js",
@@ -39,6 +40,7 @@
     "semi": false
   },
   "devDependencies": {
+    "@saulx/aristotle": "^1.1.1",
     "ava": "^0.25.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^7.0.0",
@@ -56,8 +58,9 @@
     "eslint-plugin-standard": "^3.0.1",
     "pre-commit": "^1.2.2",
     "prettier": "^1.12.1",
-    "react-dom": "^16.4.1",
-    "react-test-renderer": "^16.4.1",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.6",
+    "react-test-renderer": "^16.8.6",
     "standard": "^10.0.3"
   },
   "dependencies": {
@@ -66,8 +69,7 @@
     "path-to-regexp": "^2.2.1",
     "prop-types": "^15.6.1",
     "query-string": "^6.4.2",
-    "react": "^16.3.2",
-    "string-hash": "^1.1.3",
+    "react": "^16.8.0",
     "vigour-ua": "^4.0.0",
     "ws": "^6.1.2"
   }

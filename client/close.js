@@ -1,14 +1,22 @@
-const { removeListener, removeComponentListener } = require('./listeners')
+const {
+  removeListener,
+  removeSetListener,
+  removeComponentListener
+} = require('./listeners')
 
 const close = (hub, props, cb) => {
   if (!cb) {
     cb = props.onChange
   }
   if (cb) {
-    if (typeof cb === 'object') {
-      removeComponentListener(hub, props, cb)
+    if (props.fromHook) {
+      removeSetListener(hub, props, cb)
+    } else {
+      if (typeof cb === 'object') {
+        removeComponentListener(hub, props, cb)
+      }
+      removeListener(hub, props, cb)
     }
-    removeListener(hub, props, cb)
   } else {
     removeListener(hub, props)
   }

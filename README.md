@@ -34,5 +34,27 @@ client.close(
 )
 
 // one off
-const result = await state.rpc('f.x', { hello: true })
+const result = await client.rpc('f.subscribe', { hello: true })
+```
+
+Use it with react
+
+```javascript
+import { useRpc, useHub, Provider, createClient } from '@saulx/hub'
+const client = createClient()
+
+const Something = () => {
+   // gives access to the hub context
+  const hub = useHub()
+
+  // handles unsubscribe / subscibe internally
+  const myValue = useRpc('f.subscribe)
+  return <div>{myValue}</div>
+}
+
+const App = () => {
+  return <Provider hub={client}>
+    <Something />
+  </Provider>
+}
 ```
