@@ -79,6 +79,7 @@ exports.useRpc = (subscription, args) => {
     }
     // console.log('check this', id, performance.now() - t0, 'ms')
 
+    // id !== id of prev
     if (result === void 0) {
       if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
       result = getLocal(hub, parsed)
@@ -94,6 +95,7 @@ exports.useRpc = (subscription, args) => {
         parsed.fromHook = true
         parsed.onChange = update
         if (!hub.isNode) {
+          // double check if this gets called with a local url allways
           internalRpc(hub, parsed)
         }
         return () => {
