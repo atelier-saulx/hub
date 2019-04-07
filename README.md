@@ -44,17 +44,19 @@ import { useRpc, useHub, Provider, createClient } from '@saulx/hub'
 const client = createClient()
 
 const Something = () => {
-   // gives access to the hub context
+  // gives access to the hub context
   const hub = useHub()
 
   // handles unsubscribe / subscibe internally
-  const myValue = useRpc('f.subscribe)
+  const myValue = useRpc('f.subscribe')
   return <div>{myValue}</div>
 }
 
 const App = () => {
-  return <Provider hub={client}>
-    <Something />
-  </Provider>
+  return (
+    <Provider hub={client}>
+      <Something />
+    </Provider>
+  )
 }
 ```
