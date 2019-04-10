@@ -47,7 +47,7 @@ const Something = () => {
   // gives access to the hub context
   const hub = useHub()
 
-  // handles unsubscribe / subscibe internally
+  // handles unsubscribe / subscribe internally
   const myValue = useRpc('f.subscribe')
   return <div>{myValue}</div>
 }
