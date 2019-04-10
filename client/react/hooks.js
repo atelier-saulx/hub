@@ -10,7 +10,6 @@ const { hash, argHasher, djb2 } = require('../hash')
 const { Provider: ProviderLegacy } = require('./')
 
 exports.Provider = ({ hub, children }) => {
-  // add legacy for compat - remove this later
   return React.createElement(
     HubContext.Provider,
     {
@@ -49,6 +48,8 @@ exports.useRpc = (subscription, args) => {
   const hub = useContext(HubContext)
   let [result, update] = useState()
   const ref = useRef()
+  const idRef = useRef()
+
   if (subscription) {
     let parsed
     let id
@@ -77,13 +78,12 @@ exports.useRpc = (subscription, args) => {
       }
       id = hashed
     }
-    // console.log('check this', id, performance.now() - t0, 'ms')
 
-    // id !== id of prev
-    if (result === void 0) {
+    if (result === void 0 || (idRef && idRef.current !== id)) {
       if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
       result = getLocal(hub, parsed)
     }
+    idRef.current = id
 
     useEffect(
       () => {
@@ -91,9 +91,13 @@ exports.useRpc = (subscription, args) => {
         if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
         ref.current = parsed
         parsed.isSubscriber = true
-        parsed.listenening = false
+        parsed.id = id
+        // parsed.listenening = false
         parsed.fromHook = true
-        parsed.onChange = update
+        parsed.onChange = v => {
+          // console.log('ok ok ok update?')
+          update(v)
+        }
         if (!hub.isNode) {
           // double check if this gets called with a local url allways
           internalRpc(hub, parsed)
