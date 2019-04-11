@@ -85,6 +85,7 @@ exports.useRpc = (subscription, args, defaultValue) => {
 
     idRef.current = id
   } else {
+    result = void 0
     idRef.current = subscription
   }
 
