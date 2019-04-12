@@ -44,22 +44,43 @@ const hookFormat = (hub, props, args, hashed) => {
   return props
 }
 
+const updateRange = (hub, subscription, id, parsed, previous) => {
+  const range = subscription.range
+  if (
+    previous.id === id &&
+    (!previous.range ||
+      previous.range[0] !== range[0] ||
+      previous.range[1] !== range[1])
+  ) {
+    parsed = previous.parsed
+    if (parsed) {
+      parsed.range = range
+      previous.range = range
+      internalRpc(hub, parsed)
+      return true
+    }
+  }
+}
+
 exports.useRpc = (subscription, args, defaultValue) => {
   const hub = useContext(HubContext)
-  let [result, update] = useState()
-  const ref = useRef()
-  const idRef = useRef()
-  let parsed
-  let id
-  let hashed
+  let [result, update] = useState({})
+  const ref = useRef({ parsed: false, range: false, id: false })
+  const previous = ref.current
+  let parsed, id, hashed, range, changedRange
   if (subscription) {
     const isString = typeof subscription === 'string'
-
-    // var t0 = performance.now()
+    if (!isString && args && !defaultValue) {
+      defaultValue = args
+      args = void 0
+    }
     if (isString && args === void 0) {
       id = subscription
     } else if (!isString && subscription.args === void 0 && args === void 0) {
       id = subscription.endpoint + '.' + subscription.method
+      if (subscription.range) {
+        changedRange = updateRange(hub, subscription, id, parsed, previous)
+      }
     } else {
       if (args) {
         if (isString) {
@@ -74,46 +95,46 @@ exports.useRpc = (subscription, args, defaultValue) => {
         }
       } else {
         hashed = hash(subscription)
+        if (subscription.range) {
+          changedRange = updateRange(hub, subscription, id, parsed, previous)
+        }
       }
       id = hashed
     }
-
-    if (result === void 0 || (idRef && idRef.current !== id)) {
+    if (
+      changedRange ||
+      result.v === void 0 ||
+      (previous.id && previous.id !== id)
+    ) {
       if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
-      result = getLocal(hub, parsed)
+      result = { v: getLocal(hub, parsed) }
     }
-
-    idRef.current = id
+    previous.id = id
   } else {
     result = void 0
-    idRef.current = subscription
+    previous.id = subscription
   }
-
   useEffect(
     () => {
-      // console.log('init subs', id)
       if (subscription) {
         if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
-        ref.current = parsed
+        previous.parsed = parsed
         parsed.isSubscriber = true
         parsed.id = id
-        // parsed.listenening = false
         parsed.fromHook = true
-        parsed.onChange = v => {
-          update(v)
-        }
+        parsed.onChange = update
         if (!hub.isNode) {
-          // double check if this gets called with a local url allways
           internalRpc(hub, parsed)
+          if (range) {
+            previous.range = range
+          }
         }
         return () => {
-          // console.log('remove subs', id)
-          close(hub, ref.current)
+          close(hub, previous.parsed)
         }
       }
     },
     [id]
   )
-
-  return result === void 0 ? defaultValue : result
+  return result.v === void 0 ? defaultValue : result.v
 }

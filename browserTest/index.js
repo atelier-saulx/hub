@@ -1,47 +1,91 @@
-import React, { useState } from 'react'
-import { createClient, useHub, useRpc, Provider, connect } from '../client'
+import React, { useReducer, useEffect, useRef } from 'react'
+import { createClient, useRpc, Provider } from '../client'
 import ReactDOM from 'react-dom'
+// import { startCounter, Counter } from './counter'
 
-const client = createClient({})
+const emojis = require('./hubServer/emojis')
+const totalData = Array.from(Array(50)).map((val, i) => {
+  return {
+    realIndex: i,
+    emoji: emojis[~~(Math.random() * emojis.length - 1)]
+  }
+})
 
-client.set('device.bla', 1)
+const client = createClient({
+  url: 'ws://localhost:6062'
+})
 
-setInterval(() => {
-  client.set('device.bla', client.get('device.bla') + 1)
-}, 18)
+// client.on('connect', s => {
+//   console.log('status:', s)
+// })
 
-const Power = connect(
-  ({ data }) => {
-    return data
-  },
-  'device.bla'
-)
+client.set('device.list', totalData)
+// manages stuff with realIndex as well
+// if you pased range to the server it will add extra payload like checksum
+// which is range and it will create an array internally that it tries to fill in
+// allways wrap it in objects where you pass 'realindex' ?
+// is very handy for lists
 
-// cannot test useEffect so hard to rest useRpc
-const Thing2 = () => {
-  const hub = useHub()
-  const [bla, changeIt] = useState(0)
-  const blax = useRpc('device.bla')
-  const blurf = useRpc('device.blurf', {
-    id: ~~(bla / 5)
-  })
+const reducer = (s, v) => s + v
+
+const List = () => {
+  const element = useRef()
+  const [range, dispatch] = useReducer(reducer, 200)
+  useEffect(() => {
+    const listener = e => {
+      if (
+        element.current.offsetHeight - 200 <
+        document.documentElement.scrollTop + global.innerHeight
+      ) {
+        dispatch(100)
+      }
+    }
+    document.addEventListener('scroll', listener)
+    return () => {
+      document.removeEventListener('scroll', listener)
+    }
+  }, [])
+
+  const data = useRpc(
+    {
+      endpoint: 'data',
+      method: 'list',
+      range: [100, 100 + range]
+    },
+    []
+  )
+
   return (
     <div
+      ref={element}
       style={{
-        cursor: 'pointer'
-      }}
-      onClick={() => {
-        const newbla = bla + 1
-        const props = {
-          endpoint: 'device',
-          method: 'blurf',
-          args: { id: ~~(newbla / 5) }
-        }
-        hub.set(props, 'ballz times ' + newbla)
-        changeIt(newbla)
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap'
       }}
     >
-      THIS = "{bla}" blurf="{blurf}" blax={blax}
+      {data.length}
+      {data.map(val => {
+        return (
+          <div
+            key={'xx' + val.realIndex}
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column',
+              margin: 10,
+              width: 80,
+              height: 80,
+              fontSize: 20,
+              border: '1px solid #ccc'
+            }}
+          >
+            {val.emoji}
+            <div style={{ fontSize: 11, marginTop: 5 }}>{val.realIndex}</div>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -49,8 +93,7 @@ const Thing2 = () => {
 const App = () => {
   return (
     <Provider hub={client}>
-      <Thing2 />
-      <Power />
+      <List />
     </Provider>
   )
 }

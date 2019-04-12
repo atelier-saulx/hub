@@ -80,20 +80,19 @@ const sendSubscription = (socket, force) => {
       let channel = subs[key].channel
       subs[key].channel = void 0
       const props = subs[key].props
-      const newSub = {
-        endpoint: props.endpoint,
-        seq: ++socket.seq,
-        method: props.method,
-        args: props.args
-      }
+
+      // need to use parse for this
+      const payload = socket.createPayload(props)
+      payload.seq = ++socket.seq
+
       if (force && channel !== void 0) {
-        newSub.channel = channel
+        payload.channel = channel
         socket.resolved[channel] = socket.seq
       }
       if (props.store && props.store.checksum) {
-        newSub.checksum = props.store.checksum
+        payload.checksum = props.store.checksum
       }
-      socket.queue.push(newSub)
+      socket.queue.push(payload)
       subs[key].inProgress = socket.seq
       socket.callbacks[socket.seq] = { props }
     }
@@ -226,6 +225,7 @@ class Socket extends Emitter {
     }
   }
   close(props) {
+    props.isSent = false
     const subs = this.subscriptions[props.hash]
     if (subs) {
       subs.cnt--
@@ -234,33 +234,61 @@ class Socket extends Emitter {
       }
     }
   }
-  rpc(props, receive) {
+  createPayload(props) {
+    const isSubscriber = props.isSubscriber
+    const payload = {
+      endpoint: props.endpoint,
+      method: props.method
+    }
+    if (props.args) payload.args = props.args
+    if (props.range) {
+      payload.range = props.range
+      if (props.store.range) {
+        payload.receivedRange = props.store.range
+      }
+    }
+    if (!isSubscriber) {
+      payload.noSubscription = true
+    }
+    if (props.store.checksum) {
+      payload.checksum = props.store.checksum
+    }
+    props.isSent = true
+    return payload
+  }
+  rpc(props, update) {
     const isSubscriber = props.isSubscriber
     const hash = props.hash
+    const sub = this.subscriptions[hash]
+    if (update && props.isSent && sub) {
+      const payload = this.createPayload(props)
+      if (sub.channel !== void 0) {
+        payload.channel = sub.channel
+        this.queue.push(payload)
+        this.sendQueue()
+        return
+      } else {
+        console.log('No channel yet may miss an update now...')
+        payload.seq = ++this.seq
+        this.callbacks[this.seq] = { props }
+        this.queue.push(payload)
+        this.sendQueue()
+      }
+      return
+    }
 
     if (isSubscriber) {
-      if (!this.subscriptions[hash]) {
+      if (!sub) {
         this.subscriptions[hash] = { props, cnt: 1, inProgress: this.seq + 1 }
       } else {
-        this.subscriptions[hash].cnt++
+        sub.cnt++
         props.receive(this.hub, props, void 0, defaultReceive)
         return
       }
     }
 
-    const payload = {
-      endpoint: props.endpoint,
-      seq: ++this.seq,
-      method: props.method
-    }
-
-    if (props.args) payload.args = props.args
-    if (!isSubscriber) {
-      payload.noSubscription = true
-    } else if (props.store.checksum) {
-      payload.checksum = props.store.checksum
-    }
-
+    const payload = this.createPayload(props)
+    payload.seq = ++this.seq
     this.callbacks[this.seq] = { props }
     this.queue.push(payload)
     this.sendQueue()

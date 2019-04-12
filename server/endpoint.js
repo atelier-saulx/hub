@@ -24,6 +24,9 @@ class Endpoint {
       subs.forEach(msg => fn(this, client, msg, payload))
     })
   }
+  send() {
+    // make it default lets go
+  }
 }
 
 module.exports = Endpoint

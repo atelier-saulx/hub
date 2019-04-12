@@ -5,9 +5,9 @@ const { format } = require('./format')
 const { on, onComponent, onSet } = require('./listeners')
 const { getLocal } = require('./getLocal')
 
-const defaultSend = (hub, props, receive) => {
+const defaultSend = (hub, props, receive, update) => {
   if (hub.socket) {
-    hub.socket.rpc(props, receive)
+    hub.socket.rpc(props, update)
   } else {
     receive(hub, props, void 0, defaultReceive)
   }
@@ -17,7 +17,7 @@ const defaultReceive = (hub, props, response) => {
   if (response === void 0) {
     if (props.ready) props.ready(getLocal(hub, props))
   } else {
-    const { type = 'new', content, checksum } = response
+    const { type = 'new', content, checksum, range } = response
     if (type === void 0 || content === void 0) {
       if (props.ready) props.ready(getLocal(hub, props))
     } else if (type === 'new') {
@@ -40,6 +40,53 @@ const defaultReceive = (hub, props, response) => {
         }
       }
       if (props.ready) props.ready(getLocal(hub, props))
+    } else if (type === 'range') {
+      if (props.store !== false) {
+        if (response.error) {
+          setLocal(hub, props, void 0)
+        } else {
+          if (checksum) props.store.checksum = checksum
+
+          // if checksum is different then use normal update
+          // or add extra field for it
+          if (props.range && response.range) {
+            if (props.store.v) {
+              const prev = props.store.v
+              const rr = props.store.range
+              let update
+              if (range[0] < rr[0]) {
+                update = true
+                for (let i = 0; i < range[0] - rr[0]; i++) {
+                  prev.unshift(content[i])
+                }
+              }
+              if (range[1] + 1 > rr[1]) {
+                update = true
+                for (let i = rr[1] - range[0]; i < range[1] - range[0]; i++) {
+                  prev.push(content[i])
+                }
+              }
+              if (update) {
+                props.store.v = prev
+                emit(hub, props.store.listeners, props.store.v, props)
+              }
+            } else {
+              setLocal(hub, props, content)
+            }
+            if (props.store.range) {
+              if (response.range[0] < props.store.range[0]) {
+                props.store.range[0] = response.range[0]
+              }
+              if (response.range[1] > props.store.range[1]) {
+                props.store.range[1] = response.range[1]
+              }
+            } else {
+              props.store.range = response.range
+            }
+          }
+        }
+      }
+      if (props.ready) props.ready(getLocal(hub, props))
     }
   }
 }
@@ -49,7 +96,7 @@ const onSubscription = (hub, props) => {
   const listener = p => {
     const listener = props.onChange
     close(hub, props, listener)
-    props.listenening = false
+    props.listening = false
     props.hash = false
     props.store = false
     if (props.call) {
@@ -67,12 +114,11 @@ const onSubscription = (hub, props) => {
   })
 }
 
-const internalRpc = (hub, props) => {
+const internalRpc = (hub, props, update) => {
   if (!props.receive) props.receive = defaultReceive
   if (props.send === void 0) props.send = defaultSend
   const listener = props.onChange
-
-  if (!props.listenening && listener) {
+  if (!props.listening && listener) {
     if (props.on) {
       onSubscription(hub, props)
     }
@@ -83,22 +129,30 @@ const internalRpc = (hub, props) => {
     } else {
       on(hub, props, listener)
     }
-    props.listenening = true
+    props.listening = true
   }
 
   if (props.send) {
-    props.send(hub, props, props.receive, defaultSend)
+    if (props.range) {
+      if (props.sendRange) {
+        props.sendRange = props.range
+        update = true
+      }
+      props.sendRange = props.range
+    }
+    props.send(hub, props, props.receive, defaultSend, update)
   } else {
     props.receive(hub, props, void 0, defaultReceive)
   }
 }
 
-const rpc = (hub, props) => {
+const rpc = (hub, props, update) => {
+  // update forces an outgoing rpc to keep using the same subscription / outgoing connection
   // promise returns async generator if its a subscription
   return new Promise(resolve => {
     // will not be resolve in between value - if channel then
     props.ready = resolve
-    internalRpc(hub, props)
+    internalRpc(hub, props, update)
   })
 }
 

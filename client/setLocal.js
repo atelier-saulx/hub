@@ -59,7 +59,7 @@ const mergeLocal = (hub, props, value, immediate) => {
 }
 
 const removeLocal = (hub, props, value, immediate) => {
-  console.log('remove - not implemented yet...')
+  console.log('Remove - not implemented yet...')
 }
 
 exports.removeLocal = removeLocal

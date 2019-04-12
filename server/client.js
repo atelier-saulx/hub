@@ -94,14 +94,16 @@ class Client {
     }
   }
   subscribe(endpoint, msg) {
-    let clientSubs = endpoint.subscriptions.get(this)
-    if (!clientSubs) {
-      clientSubs = []
-      endpoint.subscriptions.set(this, clientSubs)
+    if (!msg.channel) {
+      let clientSubs = endpoint.subscriptions.get(this)
+      if (!clientSubs) {
+        clientSubs = []
+        endpoint.subscriptions.set(this, clientSubs)
+      }
+      msg.pendingChannel = ++this.channel
+      this.channels.set(msg.pendingChannel, [endpoint, msg])
+      clientSubs.push(msg)
     }
-    msg.pendingChannel = ++this.channel
-    this.channels.set(msg.pendingChannel, [endpoint, msg])
-    clientSubs.push(msg)
   }
 }
 

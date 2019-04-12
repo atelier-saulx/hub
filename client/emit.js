@@ -32,7 +32,7 @@ const emitImmediate = (hub, listeners, val, props, prev) => {
   }
   if (fnSet) {
     for (let func of fnSet) {
-      func(val)
+      func({ v: val })
     }
   }
   const components = listeners.components
@@ -66,7 +66,7 @@ const emit =
 
           if (fnSet) {
             for (let func of fnSet) {
-              func(val)
+              func({ v: val })
             }
           }
           if (fn) {

@@ -1,24 +1,5 @@
 const { Endpoint } = require('../../../../server')
-const endpoints = {}
 const emojis = require('../../emojis')
-
-const send = (endpoint, client, msg) => {
-  const checksum = endpoint.checksum
-  // eslint-disable-next-line
-  if (checksum != msg.checksum) {
-    msg.checksum = checksum
-    const content = endpoint.content
-    client.sendChannel(
-      {
-        checksum,
-        type: 'new',
-        content
-      },
-      msg,
-      endpoint
-    )
-  }
-}
 
 const totalData = Array.from(Array(1e4)).map((val, i) => {
   return {
@@ -27,41 +8,72 @@ const totalData = Array.from(Array(1e4)).map((val, i) => {
   }
 })
 
-const getIt = range => {
-  return totalData.slice(...range)
+const sliceRange = (data, msg) => {
+  const receivedRange = msg.receivedRange
+  const range = msg.range
+  if (!receivedRange) {
+    return [data.slice(range[0], range[1]), range]
+  } else {
+    let r = [void 0, void 0]
+    if (range[0] < receivedRange[0]) {
+      r = [range[0], receivedRange[0]]
+    }
+    if (range[1] > receivedRange[1]) {
+      r[1] = range[1]
+      if (r[0] === void 0) {
+        r[0] = receivedRange[1]
+      }
+    }
+    if (r[0] !== void 0 && r[1] !== void 0) {
+      return [data.slice(r[0], r[1]), r]
+    }
+  }
+  return [[], []]
 }
 
-class EndpointList extends Endpoint {
-  constructor(id) {
-    super()
-    endpoints[id] = this
-    this.id = id
-    this.content = getIt([0, 100])
+const send = (endpoint, client, msg) => {
+  // if incoming request is range handle range
+  // if object send merge
+  const checksum = endpoint.checksum
+  // also check for range
+  msg.checksum = checksum
+  const [content, range] = sliceRange(endpoint.data, msg)
+  const payload = {
+    type: 'range',
+    range: range,
+    content
   }
-  remove() {
-    delete endpoints[this.id]
+
+  // if checksum is different send everything
+  // if the same and empty array send nothing
+
+  // if (!checksum || !msg.checksum || checksum != msg.checksum) {
+  // if (checksum) {
+  //   payload.checksum = checksum
+  // }
+  if (content.length) {
+    client.sendChannel(payload, msg, endpoint)
   }
 }
 
-const createPage = msg => {
-  const id = msg.args.id
-  var endpoint = endpoints[id]
-  if (!endpoint) {
-    endpoint = endpoints[id] = new EndpointList(id)
-  }
-  return endpoint
+const getIt = (range, endpoint) => {
+  return totalData.slice(range[0], range[1])
 }
+
+class EndpointList extends Endpoint {}
+
+// checksum can use some helpers here as well...
+// need to send which range it allrdy has and checksum is of the total amount
+
+const endpoint = new EndpointList()
+endpoint.data = totalData
+
+endpoint.content = getIt([0, 10])
+// endpoint.checksum = JSON.stringify([0, 10])
 
 module.exports = async (client, msg) => {
-  // range as well
-  const range = msg.range || ''
-  console.log(msg, range)
-  const endpoint = createPage(msg)
   client.subscribe(endpoint, msg)
-  console.info('💻 Subscribe client list', msg.args.id, client.ua)
   if (endpoint.content) {
     send(endpoint, client, msg)
   }
 }
-
-module.exports.endpoints = endpoints

@@ -32,7 +32,7 @@ const subscribe = (component, props) => {
         subsArray[i] = format(hub, val)
       }
       subsArray[i].isSubscriber = true
-      subsArray[i].listenening = false
+      subsArray[i].listening = false
       subsArray[i].onChange = component
       if (!hub.isNode) {
         internalRpc(hub, subsArray[i])
