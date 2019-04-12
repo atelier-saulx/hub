@@ -93,7 +93,7 @@ class Client {
       }
     }
   }
-  subscribe(endpoint, msg) {
+  subscribe(endpoint, msg, dontSend) {
     if (!msg.channel) {
       let clientSubs = endpoint.subscriptions.get(this)
       if (!clientSubs) {
@@ -103,6 +103,27 @@ class Client {
       msg.pendingChannel = ++this.channel
       this.channels.set(msg.pendingChannel, [endpoint, msg])
       clientSubs.push(msg)
+      if (!dontSend && (endpoint.content || endpoint.data)) {
+        endpoint.send(endpoint, this, msg)
+      }
+    } else {
+      let clientSubs = endpoint.subscriptions.get(this)
+      if (clientSubs) {
+        for (let i = 0, len = clientSubs.length; i < len; i++) {
+          const subs = clientSubs[i]
+          if (
+            subs.channel === msg.channel &&
+            subs.method === msg.method &&
+            subs.endpoint === msg.endpoint
+          ) {
+            subs.range = msg.range
+            subs.receivedRange = msg.receivedRange
+            if (!dontSend && (endpoint.content || endpoint.data)) {
+              endpoint.send(endpoint, this, subs)
+            }
+          }
+        }
+      }
     }
   }
 }

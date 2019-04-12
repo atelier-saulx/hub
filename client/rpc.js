@@ -57,7 +57,7 @@ const defaultReceive = (hub, props, response) => {
 
               if (range[0] < rr[0]) {
                 update = true
-                for (let i = 0; i < range[0] - rr[0]; i++) {
+                for (let i = 0; i < rr[0] - range[0]; i++) {
                   prev.unshift(content[i])
                 }
               }
@@ -70,14 +70,18 @@ const defaultReceive = (hub, props, response) => {
 
               if (changedContent) {
                 update = true
-                const i = range[0] - rr[0]
-                const max = rr[1] - range[0]
-                console.log(i, max)
-                // for (let i = range[0] - rr[0]; i < range[1] - range[0]; i++) {
-                //   if (prev[i] === void 0) {
-                //     prev[i + (range[0] - rr[0])] = content[i]
-                //   }
-                // }
+                const start = rr[0] - range[0]
+                const len =
+                  range[1] + 1 > rr[1] ? rr[1] - range[0] : content.length
+                if (start < 0) {
+                  for (let i = 0; i < len; i++) {
+                    prev[i - start] = content[i]
+                  }
+                } else {
+                  for (let i = start; i < len; i++) {
+                    prev[i] = content[i]
+                  }
+                }
               }
               if (update) {
                 props.store.v = prev

@@ -31,13 +31,14 @@ const reducer = (s, v) => s + v
 const List = () => {
   const element = useRef()
   const [range, dispatch] = useReducer(reducer, 200)
+
   useEffect(() => {
     const listener = e => {
       if (
         element.current.offsetHeight - 200 <
         document.documentElement.scrollTop + global.innerHeight
       ) {
-        dispatch(100)
+        dispatch(50)
       }
     }
     document.addEventListener('scroll', listener)
@@ -50,7 +51,7 @@ const List = () => {
     {
       endpoint: 'data',
       method: 'list',
-      range: [100, 100 + range]
+      range: [Math.max(0, range - 50), range]
     },
     []
   )

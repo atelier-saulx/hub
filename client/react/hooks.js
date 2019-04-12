@@ -44,21 +44,20 @@ const hookFormat = (hub, props, args, hashed) => {
   return props
 }
 
-const updateRange = (hub, subscription, id, parsed, previous) => {
+const updateRange = (hub, subscription, id, previous) => {
   const range = subscription.range
+  const parsed = previous.parsed
   if (
+    parsed &&
     previous.id === id &&
     (!previous.range ||
       previous.range[0] !== range[0] ||
       previous.range[1] !== range[1])
   ) {
-    parsed = previous.parsed
-    if (parsed) {
-      parsed.range = range
-      previous.range = range
-      internalRpc(hub, parsed)
-      return true
-    }
+    parsed.range = range
+    previous.range = range
+    internalRpc(hub, parsed)
+    return true
   }
 }
 
@@ -79,7 +78,7 @@ exports.useRpc = (subscription, args, defaultValue) => {
     } else if (!isString && subscription.args === void 0 && args === void 0) {
       id = subscription.endpoint + '.' + subscription.method
       if (subscription.range) {
-        changedRange = updateRange(hub, subscription, id, parsed, previous)
+        changedRange = updateRange(hub, subscription, id, previous)
       }
     } else {
       if (args) {
@@ -96,7 +95,7 @@ exports.useRpc = (subscription, args, defaultValue) => {
       } else {
         hashed = hash(subscription)
         if (subscription.range) {
-          changedRange = updateRange(hub, subscription, id, parsed, previous)
+          changedRange = updateRange(hub, subscription, id, previous)
         }
       }
       id = hashed

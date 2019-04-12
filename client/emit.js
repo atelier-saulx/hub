@@ -1,5 +1,6 @@
 const timers = {}
 var cnt = 0
+const { getLocal } = require('./getLocal')
 
 const loop = () => {
   global.requestAnimationFrame(() => {
@@ -31,8 +32,14 @@ const emitImmediate = (hub, listeners, val, props, prev) => {
     emitFn(fn, val, props, prev)
   }
   if (fnSet) {
+    let v
+    if (props.range) {
+      v = { v: getLocal(hub, props) }
+    } else {
+      v = { v: val }
+    }
     for (let func of fnSet) {
-      func({ v: val })
+      func(v)
     }
   }
   const components = listeners.components
@@ -65,8 +72,14 @@ const emit =
           const fnSet = listeners.fnSet
 
           if (fnSet) {
+            let v
+            if (props.range) {
+              v = { v: getLocal(hub, props) }
+            } else {
+              v = { v: val }
+            }
             for (let func of fnSet) {
-              func({ v: val })
+              func(v)
             }
           }
           if (fn) {

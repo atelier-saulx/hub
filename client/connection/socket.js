@@ -120,6 +120,24 @@ const listen = socket => {
   })
 }
 
+/*
+// can make a more efficient packing mechanism
+// e.g. array and remove hash
+// on connect sends a map pf endpoints / methods []
+// first 8 bits
+// isChannel 1 bits
+// seq / channel 20 bits
+// has range 1 bits
+// range 20 bits 20 bits
+// received range 20 bits 20 bits
+// 9 + 20 + 1 + 40 + 40
+// 110 bits
+// vs 136 * 8 = 1088
+// if args == { id } just send a string (makes it 9 bytes)
+// 9 * 8  vs 18
+// get to 182 bits vs  576 (rly worth it :/) (its on every msg)
+*/
+
 class Socket extends Emitter {
   constructor(hub, url) {
     super()
@@ -163,13 +181,11 @@ class Socket extends Emitter {
             if (this.hub.debug) {
               console.log('Outgoing:', queue)
             }
-
             this.connection.ws.send(JSON.stringify(queue))
           } else {
             if (this.hub.debug) {
               console.log('Outgoing:', this.queue)
             }
-
             this.connection.ws.send(JSON.stringify(this.queue))
           }
           this.queue = []
@@ -262,19 +278,33 @@ class Socket extends Emitter {
     const sub = this.subscriptions[hash]
     if (update && props.isSent && sub) {
       const payload = this.createPayload(props)
-      console.log('update...', props)
+      if (props.inQueue !== void 0) {
+        if (
+          this.queue[props.inQueue] &&
+          this.queue[props.inQueue].hash === props.hash
+        ) {
+          const q = this.queue[props.inQueue]
+          if (q.channel) {
+            payload.channel = q.channel
+          } else {
+            payload.seq = q.seq
+          }
+          this.queue[props.inQueue] = payload
+          return
+        } else {
+          props.inQueue = void 0
+        }
+      }
       if (sub.channel !== void 0) {
         payload.channel = sub.channel
-        this.queue.push(payload)
-        this.sendQueue()
-        return
       } else {
-        console.log('No channel yet may miss an update now...')
         payload.seq = ++this.seq
         this.callbacks[this.seq] = { props }
-        this.queue.push(payload)
-        this.sendQueue()
       }
+      payload.hash = props.hash
+      this.queue.push(payload)
+      props.inQueue = this.queue.length - 1
+      this.sendQueue()
       return
     }
 
