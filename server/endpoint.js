@@ -88,7 +88,7 @@ class Endpoint {
     if (!this.timer) {
       this.timer = setTimeout(() => {
         if (!this.subscriptions.size) {
-          fn()
+          fn.call(this)
         }
         this.timer = false
       }, time)
