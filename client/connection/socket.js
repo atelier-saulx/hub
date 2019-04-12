@@ -262,6 +262,7 @@ class Socket extends Emitter {
     const sub = this.subscriptions[hash]
     if (update && props.isSent && sub) {
       const payload = this.createPayload(props)
+      console.log('update...', props)
       if (sub.channel !== void 0) {
         payload.channel = sub.channel
         this.queue.push(payload)

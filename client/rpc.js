@@ -46,7 +46,7 @@ const defaultReceive = (hub, props, response) => {
           setLocal(hub, props, void 0)
         } else {
           if (checksum) props.store.checksum = checksum
-
+          const changedContent = true // checksum !== props.store.checksum
           // if checksum is different then use normal update
           // or add extra field for it
           if (props.range && response.range) {
@@ -54,6 +54,7 @@ const defaultReceive = (hub, props, response) => {
               const prev = props.store.v
               const rr = props.store.range
               let update
+
               if (range[0] < rr[0]) {
                 update = true
                 for (let i = 0; i < range[0] - rr[0]; i++) {
@@ -65,6 +66,18 @@ const defaultReceive = (hub, props, response) => {
                 for (let i = rr[1] - range[0]; i < range[1] - range[0]; i++) {
                   prev.push(content[i])
                 }
+              }
+
+              if (changedContent) {
+                update = true
+                const i = range[0] - rr[0]
+                const max = rr[1] - range[0]
+                console.log(i, max)
+                // for (let i = range[0] - rr[0]; i < range[1] - range[0]; i++) {
+                //   if (prev[i] === void 0) {
+                //     prev[i + (range[0] - rr[0])] = content[i]
+                //   }
+                // }
               }
               if (update) {
                 props.store.v = prev

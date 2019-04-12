@@ -67,7 +67,7 @@ exports.useRpc = (subscription, args, defaultValue) => {
   let [result, update] = useState({})
   const ref = useRef({ parsed: false, range: false, id: false })
   const previous = ref.current
-  let parsed, id, hashed, range, changedRange
+  let parsed, id, hashed, changedRange
   if (subscription) {
     const isString = typeof subscription === 'string'
     if (!isString && args && !defaultValue) {
@@ -101,6 +101,7 @@ exports.useRpc = (subscription, args, defaultValue) => {
       }
       id = hashed
     }
+
     if (
       changedRange ||
       result.v === void 0 ||
@@ -119,15 +120,15 @@ exports.useRpc = (subscription, args, defaultValue) => {
       if (subscription) {
         if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
         previous.parsed = parsed
+        if (parsed.range) {
+          previous.range = parsed.range
+        }
         parsed.isSubscriber = true
         parsed.id = id
         parsed.fromHook = true
         parsed.onChange = update
         if (!hub.isNode) {
           internalRpc(hub, parsed)
-          if (range) {
-            previous.range = range
-          }
         }
         return () => {
           close(hub, previous.parsed)

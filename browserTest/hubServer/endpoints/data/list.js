@@ -14,6 +14,10 @@ const sliceRange = (data, msg) => {
   if (!receivedRange) {
     return [data.slice(range[0], range[1]), range]
   } else {
+    // const r = [receivedRange[0] - 5, receivedRange[1] + 5]
+    // console.log(r, receivedRange)
+    // return [data.slice(r[0], r[1]), r]
+
     let r = [void 0, void 0]
     if (range[0] < receivedRange[0]) {
       r = [range[0], receivedRange[0]]
@@ -30,6 +34,8 @@ const sliceRange = (data, msg) => {
   }
   return [[], []]
 }
+
+// if checksum is different send the whole range again
 
 const send = (endpoint, client, msg) => {
   // if incoming request is range handle range
@@ -72,6 +78,7 @@ endpoint.content = getIt([0, 10])
 // endpoint.checksum = JSON.stringify([0, 10])
 
 module.exports = async (client, msg) => {
+  console.log('receive', msg.range)
   client.subscribe(endpoint, msg)
   if (endpoint.content) {
     send(endpoint, client, msg)
