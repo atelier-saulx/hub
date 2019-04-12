@@ -1,9 +1,7 @@
 const { Endpoint } = require('../../../../server')
 const emojis = require('../../emojis')
 
-class EndpointList extends Endpoint {}
-
-const endpoint = new EndpointList()
+const endpoint = new Endpoint()
 
 var cnt = 0
 setInterval(() => {

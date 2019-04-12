@@ -51,7 +51,8 @@ const List = () => {
     {
       endpoint: 'data',
       method: 'list',
-      range: [Math.max(0, range - 50), range]
+      // Math.max(0, range - 50)
+      range: [0, range]
     },
     []
   )
@@ -87,6 +88,7 @@ const List = () => {
           </div>
         )
       })}
+      <div onClick={() => {}}>ADD ITEM</div>
     </div>
   )
 }
