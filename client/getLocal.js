@@ -1,7 +1,6 @@
 const getLocal = (hub, props) => {
   const store = props.store
   const v = store.v === void 0 ? props.default : store.v
-
   if (v !== void 0 && props.range) {
     if (store.range) {
       return v.slice(
