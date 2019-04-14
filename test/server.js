@@ -167,3 +167,31 @@ test.only('server checksum', async t => {
   t.deepEqual(checksum, [undefined, 1])
   t.pass()
 })
+
+test.only('no subscriber rpc calls', async t => {
+  const endpoint = new Endpoint()
+  endpoint.setData(
+    {
+      someData: true
+    },
+    1
+  )
+  createServer({
+    port: 9097,
+    endpoints: {
+      subscription: {
+        test: (client, msg) => {
+          client.subscribe(endpoint, msg)
+        }
+      }
+    }
+  })
+  const client = createClient({ url: 'ws://localhost:9097' })
+  const incoming = await client.rpc('subscription.test')
+  await wait(100)
+  t.is(endpoint.subscriptions.size, 0)
+  t.deepEqual(incoming, { someData: true })
+  const secondIncoming = await client.rpc('subscription.test')
+  t.deepEqual(secondIncoming, { someData: true })
+  t.pass()
+})

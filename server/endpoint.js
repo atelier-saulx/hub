@@ -141,6 +141,7 @@ class Endpoint {
       }
     } else {
       const checksum = endpoint.checksum
+      // if checksum === same && no subscriber send back no change
       // eslint-disable-next-line
       if (checksum != msg.checksum) {
         msg.checksum = checksum
@@ -156,6 +157,8 @@ class Endpoint {
             endpoint
           )
         }
+      } else if (msg.noSubscription) {
+        client.sendChannel({}, msg, endpoint)
       }
     }
   }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHub, useRpc, Provider } from '../client/react/hooks'
+import { useHub, Provider } from '../client/react/hooks'
 import { createClient } from '../client'
 import test from 'ava'
 import renderer from 'react-test-renderer'
@@ -18,7 +18,7 @@ test('hooks api', t => {
 
   // console.log('cannot test useEffect so hard to rest useRpc')
   const Thing2 = () => {
-    const [, hub] = useRpc('device.bla')
+    const hub = useHub()
     return hub.get('device.bla')
   }
 

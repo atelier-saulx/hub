@@ -47,8 +47,6 @@ const defaultReceive = (hub, props, response) => {
         } else {
           if (checksum) props.store.checksum = checksum
           const changedContent = true // checksum !== props.store.checksum
-          // if checksum is different then use normal update
-          // or add extra field for it
           if (props.range && response.range) {
             if (props.store.v) {
               const prev = props.store.v
@@ -67,7 +65,6 @@ const defaultReceive = (hub, props, response) => {
                   prev.push(content[i])
                 }
               }
-
               if (changedContent) {
                 update = true
                 const start = rr[0] - range[0]
