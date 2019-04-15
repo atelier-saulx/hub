@@ -4,7 +4,12 @@ const sliceRange = (data, msg, force) => {
   const receivedRange = msg.receivedRange
   const range = msg.range
   if (!receivedRange || force) {
-    return [data.slice(range[0], range[1]), range]
+    const r = [...range]
+    if (r[1] > data.length) {
+      r[1] = data.length
+    }
+
+    return [data.slice(r[0], r[1]), r]
   } else {
     let r = [void 0, void 0]
     if (range[0] < receivedRange[0]) {
@@ -16,6 +21,11 @@ const sliceRange = (data, msg, force) => {
         r[0] = receivedRange[1]
       }
     }
+
+    if (r[1] > data.length) {
+      r[1] = data.length
+    }
+
     if (r[0] !== void 0 && r[1] !== void 0) {
       return [data.slice(r[0], r[1]), r]
     }

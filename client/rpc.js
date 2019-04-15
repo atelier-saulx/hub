@@ -48,6 +48,12 @@ const defaultReceive = (hub, props, response) => {
           if (checksum) props.store.checksum = checksum
           const changedContent = true // checksum !== props.store.checksum
           if (props.range && response.range) {
+            if (response.range < props.range) {
+              props.store.receivedLast = true
+            } else if (props.store.receivedLast) {
+              props.store.receivedLast = false
+            }
+
             if (props.store.v) {
               const prev = props.store.v
               const rr = props.store.range

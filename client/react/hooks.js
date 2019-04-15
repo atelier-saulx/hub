@@ -61,6 +61,8 @@ const updateRange = (hub, subscription, id, previous) => {
   }
 }
 
+const isNode = typeof window === 'undefined'
+
 exports.useRpc = (subscription, args, defaultValue) => {
   const hub = useContext(HubContext)
   let [result, update] = useState({})
@@ -95,7 +97,7 @@ exports.useRpc = (subscription, args, defaultValue) => {
       } else {
         hashed = hash(subscription)
         if (subscription.range) {
-          changedRange = updateRange(hub, subscription, id, previous)
+          changedRange = updateRange(hub, subscription, hashed, previous)
         }
       }
       id = hashed
@@ -114,27 +116,29 @@ exports.useRpc = (subscription, args, defaultValue) => {
     result = void 0
     previous.id = subscription
   }
-  useEffect(
-    () => {
-      if (subscription) {
-        if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
-        previous.parsed = parsed
-        if (parsed.range) {
-          previous.range = parsed.range
+  if (!isNode) {
+    useEffect(
+      () => {
+        if (subscription) {
+          if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
+          previous.parsed = parsed
+          if (parsed.range) {
+            previous.range = parsed.range
+          }
+          parsed.isSubscriber = true
+          parsed.id = id
+          parsed.fromHook = true
+          parsed.onChange = update
+          if (!hub.isNode) {
+            internalRpc(hub, parsed)
+          }
+          return () => {
+            close(hub, previous.parsed)
+          }
         }
-        parsed.isSubscriber = true
-        parsed.id = id
-        parsed.fromHook = true
-        parsed.onChange = update
-        if (!hub.isNode) {
-          internalRpc(hub, parsed)
-        }
-        return () => {
-          close(hub, previous.parsed)
-        }
-      }
-    },
-    [id]
-  )
-  return result.v === void 0 ? defaultValue : result.v
+      },
+      [id]
+    )
+  }
+  return result === void 0 || result.v === void 0 ? defaultValue : result.v
 }
