@@ -4,9 +4,10 @@ const emojis = require('../../emojis')
 const endpoint = new Endpoint()
 
 var cnt = 0
-setInterval(() => {
+
+const d = () => {
   cnt++
-  const totalData = Array.from(Array(1e4)).map((val, i) => {
+  const totalData = Array.from(Array(5)).map((val, i) => {
     return {
       realIndex: i,
       emoji: emojis[~~(Math.random() * emojis.length - 1)]
@@ -14,7 +15,11 @@ setInterval(() => {
   })
   endpoint.setData(totalData, cnt)
   endpoint.emit()
-}, 5e3)
+}
+
+setInterval(d, 5e3)
+
+d()
 
 module.exports = async (client, msg) => {
   console.log('receive', msg)

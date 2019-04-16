@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect, useRef } from 'react'
-import { createClient, useRpc, Provider } from '../client'
+import { createClient, useRpc, Provider, useHub } from '../client'
 import ReactDOM from 'react-dom'
 // import { startCounter, Counter } from './counter'
 
@@ -55,6 +55,15 @@ const List = () => {
       range: [0, range]
     },
     []
+  )
+
+  const hub = useHub()
+
+  console.log(
+    hub.getStore({
+      endpoint: 'data',
+      method: 'list'
+    })
   )
 
   return (
