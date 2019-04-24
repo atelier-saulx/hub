@@ -7,7 +7,7 @@ var cnt = 0
 
 const d = () => {
   cnt++
-  const totalData = Array.from(Array(5)).map((val, i) => {
+  const totalData = Array.from(Array(500)).map((val, i) => {
     return {
       realIndex: i,
       emoji: emojis[~~(Math.random() * emojis.length - 1)]

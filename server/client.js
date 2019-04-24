@@ -47,6 +47,7 @@ class Client {
       msg.channel = payload.channel = msg.pendingChannel
       msg.pendingChannel = 0
       payload.seq = msg.seq
+      payload.channel = msg.channel
       this.sendSocket(payload)
     }
     if (msg.noSubscription) {
@@ -74,12 +75,17 @@ class Client {
     } else {
       subscription = this.channels.get(channel)
     }
+    // console.log('CLOSE', channel, seq)
     if (subscription) {
       const [endpoint, msg] = subscription
       const subs = endpoint.subscriptions.get(this)
       if (subs) {
         for (let i = 0; i < subs.length; i++) {
           if (subs[i] === msg) {
+            const channel = msg.channel || msg.pendingChannel
+            if (channel) {
+              this.channels.delete(channel)
+            }
             subs.splice(i, 1)
             break
           }
@@ -96,11 +102,8 @@ class Client {
   subscribe(endpoint, msg, dontSend) {
     let dontSubscribe
     if (!msg.channel) {
-      if (!dontSend && (endpoint.content || endpoint.data)) {
-        endpoint.send(endpoint, this, msg)
-        if (msg.noSubscription) {
-          dontSubscribe = true
-        }
+      if (msg.noSubscription) {
+        dontSubscribe = true
       }
       if (!dontSubscribe) {
         let clientSubs = endpoint.subscriptions.get(this)
@@ -111,6 +114,10 @@ class Client {
         msg.pendingChannel = ++this.channel
         this.channels.set(msg.pendingChannel, [endpoint, msg])
         clientSubs.push(msg)
+      }
+
+      if (!dontSend && (endpoint.content || endpoint.data)) {
+        endpoint.send(endpoint, this, msg)
       }
     } else {
       let clientSubs = endpoint.subscriptions.get(this)

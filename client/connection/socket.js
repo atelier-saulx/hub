@@ -137,7 +137,6 @@ const listen = socket => {
 // 9 * 8  vs 18
 // get to 182 bits vs  576 (rly worth it :/) (its on every msg)
 */
-
 class Socket extends Emitter {
   constructor(hub, url) {
     super()
@@ -276,25 +275,29 @@ class Socket extends Emitter {
     const isSubscriber = props.isSubscriber
     const hash = props.hash
     const sub = this.subscriptions[hash]
+
     if (update && props.isSent && sub) {
       const payload = this.createPayload(props)
-      if (props.inQueue !== void 0) {
+      const inQueue = props.store.inQueue
+      if (inQueue !== void 0) {
         if (
-          this.queue[props.inQueue] &&
-          this.queue[props.inQueue].hash === props.hash
+          this.queue[inQueue] &&
+          (this.queue[inQueue].hash === props.hash ||
+            this.queue[inQueue].seq === sub.inProgress)
         ) {
-          const q = this.queue[props.inQueue]
+          const q = this.queue[inQueue]
           if (q.channel) {
             payload.channel = q.channel
           } else {
             payload.seq = q.seq
           }
-          this.queue[props.inQueue] = payload
+          this.queue[inQueue] = payload
           return
         } else {
-          props.inQueue = void 0
+          props.store.inQueue = void 0
         }
       }
+
       if (sub.channel !== void 0) {
         payload.channel = sub.channel
       } else {
@@ -303,7 +306,7 @@ class Socket extends Emitter {
       }
       payload.hash = props.hash
       this.queue.push(payload)
-      props.inQueue = this.queue.length - 1
+      props.store.inQueue = this.queue.length - 1
       this.sendQueue()
       return
     }
@@ -311,6 +314,9 @@ class Socket extends Emitter {
     if (isSubscriber) {
       if (!sub) {
         this.subscriptions[hash] = { props, cnt: 1, inProgress: this.seq + 1 }
+        if (props.range) {
+          props.store.inQueue = this.queue.length
+        }
       } else {
         sub.cnt++
         props.receive(this.hub, props, void 0, defaultReceive)
@@ -322,6 +328,7 @@ class Socket extends Emitter {
     payload.seq = ++this.seq
     this.callbacks[this.seq] = { props }
     this.queue.push(payload)
+
     this.sendQueue()
   }
 }

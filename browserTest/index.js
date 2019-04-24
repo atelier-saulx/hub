@@ -20,6 +20,16 @@ const client = createClient({
 // })
 
 client.set('device.list', totalData)
+
+client
+  .rpc({
+    endpoint: 'data',
+    method: 'list'
+  })
+  .then(val => {
+    console.log('go go go ', val)
+  })
+
 // manages stuff with realIndex as well
 // if you pased range to the server it will add extra payload like checksum
 // which is range and it will create an array internally that it tries to fill in
@@ -112,6 +122,6 @@ const App = () => {
 
 const d = document.createElement('div')
 
-ReactDOM.render(<App />, d)
+// ReactDOM.render(<App />, d)
 
 document.body.appendChild(d)
