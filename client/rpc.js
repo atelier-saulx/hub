@@ -50,7 +50,6 @@ const defaultReceive = (hub, props, response) => {
           if (props.range && response.range) {
             if (response.range[1] < props.range[1]) {
               props.store.receivedLast = true
-              console.log('YESH COMPLETE')
             } else if (props.store.receivedLast) {
               props.store.receivedLast = false
             }
