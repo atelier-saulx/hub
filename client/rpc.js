@@ -50,11 +50,12 @@ const defaultReceive = (hub, props, response) => {
           if (props.range && response.range) {
             if (response.range[1] < props.range[1]) {
               props.store.receivedLast = true
+              console.log('YESH COMPLETE')
             } else if (props.store.receivedLast) {
               props.store.receivedLast = false
             }
 
-            if (props.store.v) {
+            if (props.store.v && props.store.range) {
               const prev = props.store.v
               const rr = props.store.range
               let update
@@ -91,7 +92,9 @@ const defaultReceive = (hub, props, response) => {
                 emit(hub, props.store.listeners, props.store.v, props)
               }
             } else {
-              setLocal(hub, props, content)
+              props.store.v = content
+              emit(hub, props.store.listeners, props.store.v, props)
+              // setLocal(hub, props, content)
             }
             if (props.store.range) {
               if (response.range[0] < props.store.range[0]) {

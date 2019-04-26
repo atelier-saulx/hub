@@ -115,7 +115,6 @@ class Client {
         this.channels.set(msg.pendingChannel, [endpoint, msg])
         clientSubs.push(msg)
       }
-
       if (!dontSend && (endpoint.content || endpoint.data)) {
         endpoint.send(endpoint, this, msg)
       }

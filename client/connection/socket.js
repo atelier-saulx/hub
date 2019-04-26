@@ -7,7 +7,11 @@ const handleIncoming = (socket, data) => {
   let seq = data.seq
 
   if (socket.hub.debug) {
-    console.log('Incoming:', JSON.parse(JSON.stringify(data, false, 2)))
+    // if (!global.incoming) {
+    // global.incoming = []
+    // }
+    // global.incoming.push(JSON.parse(JSON.stringify(data)))
+    console.log('Incoming:', JSON.parse(JSON.stringify(data)))
   }
 
   if (!seq && hasChannel && socket.resolved[data.channel]) {
