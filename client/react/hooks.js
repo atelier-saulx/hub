@@ -65,7 +65,7 @@ const isNode = typeof window === 'undefined'
 
 var cnt = 0
 exports.useRpc = (subscription, args, defaultValue) => {
-  console.log('useRpc', ++cnt) // subscription
+  // console.log('useRpc now - ', ++cnt) // subscription
   const hub = useContext(HubContext)
   let [result, update] = useState({})
   const ref = useRef({ parsed: false, range: false, id: false })

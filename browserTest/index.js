@@ -19,6 +19,8 @@ const client = createClient({
 //   console.log('status:', s)
 // })
 
+client.debug = true
+
 client.set('device.list', totalData)
 
 client.set(
@@ -53,12 +55,16 @@ client.set(
 // allways wrap it in objects where you pass 'realindex' ?
 // is very handy for lists
 
-const ThingInner = ({ mod }) => {
+const ThingInner = ({ mod = 0 }) => {
   const [y, set] = useState('a')
   const x = useRpc(
-    'data.complex',
     {
-      id: y
+      endpoint: 'data',
+      method: 'complex',
+      range: [0, mod + 1],
+      args: {
+        id: y
+      }
     },
     []
   )
