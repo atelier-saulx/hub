@@ -63,7 +63,9 @@ const updateRange = (hub, subscription, id, previous) => {
 
 const isNode = typeof window === 'undefined'
 
+var cnt = 0
 exports.useRpc = (subscription, args, defaultValue) => {
+  console.log('useRpc', ++cnt) // subscription
   const hub = useContext(HubContext)
   let [result, update] = useState({})
   const ref = useRef({ parsed: false, range: false, id: false })
@@ -109,10 +111,14 @@ exports.useRpc = (subscription, args, defaultValue) => {
       (previous.id && previous.id !== id)
     ) {
       if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
-      result = { v: getLocal(hub, parsed) }
+      const l = getLocal(hub, parsed)
+      result.v = l
+      result = { v: l }
+      // return result.v
     }
     previous.id = id
   } else {
+    result.v = void 0
     result = void 0
     previous.id = subscription
   }
@@ -129,6 +135,7 @@ exports.useRpc = (subscription, args, defaultValue) => {
           parsed.id = id
           parsed.fromHook = true
           parsed.onChange = update
+
           if (!hub.isNode) {
             internalRpc(hub, parsed)
           }
