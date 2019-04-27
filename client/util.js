@@ -39,7 +39,6 @@ const deepNotEqual = (a, b) => {
       if (a.checksum !== b.checksum) {
         return true
       } else {
-        // console.log('CHECKSUM IS EQUAL')
         return false
       }
     }
@@ -69,7 +68,6 @@ const deepNotEqual = (a, b) => {
     for (let key in b) {
       cnt--
       if (cnt < 0) {
-        // console.log('LENGTH DIFF')
         return true
       }
     }

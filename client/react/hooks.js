@@ -63,7 +63,7 @@ const updateRange = (hub, subscription, id, previous) => {
 
 const isNode = typeof window === 'undefined'
 
-var cnt = 0
+// var cnt = 0
 exports.useRpc = (subscription, args, defaultValue) => {
   // console.log('useRpc now - ', ++cnt) // subscription
   const hub = useContext(HubContext)
