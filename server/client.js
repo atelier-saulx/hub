@@ -105,6 +105,13 @@ class Client {
       if (msg.noSubscription) {
         dontSubscribe = true
       }
+
+      if (!dontSend && (endpoint.content || endpoint.data)) {
+        endpoint.send(endpoint, this, msg)
+      } else if (dontSubscribe) {
+        dontSubscribe = false
+      }
+
       if (!dontSubscribe) {
         let clientSubs = endpoint.subscriptions.get(this)
         if (!clientSubs) {
@@ -114,9 +121,6 @@ class Client {
         msg.pendingChannel = ++this.channel
         this.channels.set(msg.pendingChannel, [endpoint, msg])
         clientSubs.push(msg)
-      }
-      if (!dontSend && (endpoint.content || endpoint.data)) {
-        endpoint.send(endpoint, this, msg)
       }
     } else {
       let clientSubs = endpoint.subscriptions.get(this)
