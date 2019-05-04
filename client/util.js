@@ -76,16 +76,67 @@ const deepNotEqual = (a, b) => {
 }
 
 const mergeObj = (a, b) => {
-  for (let key in a) {
-    if (b[key] === void 0) {
-      b[key] = a[key]
-    } else if (a[key] && typeof a[key] === 'object') {
-      if (b[key] && typeof b[key] === 'object' && !Array.isArray(b[key])) {
-        mergeObj(a[key], b[key])
+  let changed = false
+  if (Array.isArray(a)) {
+    let arrayCorrection = 0
+    for (let key in b) {
+      let k = key * 1 - arrayCorrection
+      if (b[key] === null) {
+        arrayCorrection++
+        a.splice(k, 1)
+      } else {
+        if (
+          a[k] &&
+          typeof a[k] === 'object' &&
+          b[key] &&
+          typeof b[key] === 'object'
+        ) {
+          if (mergeObj(a[k], b[key])) {
+            changed = true
+          }
+        } else {
+          if (a[k] === void 0 && a.length <= k) {
+            a.push(b[key])
+            changed = true
+          } else {
+            if (deepNotEqual(a[k], b[key])) {
+              changed = true
+            }
+            a[k] = b[key]
+          }
+        }
+      }
+    }
+  } else {
+    for (let key in b) {
+      if (
+        a[key] &&
+        typeof a[key] === 'object' &&
+        b[key] &&
+        typeof b[key] === 'object'
+      ) {
+        if (mergeObj(a[key], b[key])) {
+          changed = true
+        }
+      } else {
+        if (a[key] !== void 0) {
+          if (b[key] === null) {
+            delete a[key]
+            changed = true
+          } else {
+            if (deepNotEqual(a[key], b[key])) {
+              changed = true
+            }
+            a[key] = b[key]
+          }
+        } else {
+          a[key] = b[key]
+          changed = true
+        }
       }
     }
   }
-  return b
+  return changed
 }
 
 exports.mergeObj = mergeObj

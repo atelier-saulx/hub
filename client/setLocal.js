@@ -43,15 +43,24 @@ const setLocal = (hub, props, value, immediate) => {
 
 const mergeLocal = (hub, props, value, immediate) => {
   const store = props.store
+  let isUpdated
   const prev = store.v === void 0 ? props.default : store.v
   if (typeof value === 'object' && prev && typeof prev === 'object') {
-    value = mergeObj(prev, value)
+    isUpdated = mergeObj(prev, value, true)
+    value = prev
   }
   const listeners = store.listeners
   if (listeners) {
     store.v = value
-    // diff check can be optmized here
-    emitChange(hub, listeners, value, props, prev, immediate)
+    if (isUpdated === void 0) {
+      emitChange(hub, listeners, value, props, prev, immediate)
+    } else if (isUpdated === true) {
+      if (immediate) {
+        emitImmediate(hub, listeners, value, props, prev)
+      } else {
+        emit(hub, listeners, value, props, prev)
+      }
+    }
   } else {
     store.v = value
   }

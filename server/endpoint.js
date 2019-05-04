@@ -74,6 +74,12 @@ class Endpoint {
     this.checksum = checksum
     return changed
   }
+  setDiff(data) {
+    this.diff = data
+    if (!this.diff.content && this.diff.data) {
+      this.diff.content = JSON.stringify(this.diff.data)
+    }
+  }
   // content is allways pre-stringified
   setContent(data, checksum) {
     if (typeof data === 'object') {
@@ -151,16 +157,27 @@ class Endpoint {
       }
     } else {
       const checksum = endpoint.checksum
-      // if checksum === same && no subscriber send back no change
       // eslint-disable-next-line
       if (checksum != msg.checksum) {
+        let content = endpoint.content || endpoint.data
+        let type = 'new'
+        if (endpoint.diff && msg.checksum) {
+          if (
+            // eslint-disable-next-line
+            endpoint.diff.from[0] == msg.checksum &&
+            // eslint-disable-next-line
+            endpoint.diff.from[1] == checksum
+          ) {
+            content = endpoint.diff.content
+            type = 'update'
+          }
+        }
         msg.checksum = checksum
-        const content = endpoint.content || endpoint.data
         if (content) {
           client.sendChannel(
             {
               checksum,
-              type: 'new',
+              type,
               content
             },
             msg,
