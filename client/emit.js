@@ -67,7 +67,7 @@ const emit =
           const val = timers[timerId][1]
           delete timers[timerId]
           cnt--
-          if (listeners.removed) return
+          if (!listeners || listeners.removed) return
           const fn = listeners.fn
           const fnSet = listeners.fnSet
 
