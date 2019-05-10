@@ -34,7 +34,7 @@ const configure = (hub, config) => {
   }
 
   if (hub._config) {
-    mergeObj(config, hub._config)
+    mergeObj(hub._config, config)
   } else {
     hub._config = config
   }
