@@ -266,6 +266,11 @@ class Socket extends Emitter {
         payload.receivedRange = props.store.range
       }
     }
+
+    if (props.timeout) {
+      payload.needConfirmation = true
+    }
+
     if (!isSubscriber) {
       payload.noSubscription = true
     }

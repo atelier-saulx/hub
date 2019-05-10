@@ -184,7 +184,7 @@ class Endpoint {
             endpoint
           )
         }
-      } else if (msg.noSubscription) {
+      } else if (msg.noSubscription || msg.needConfirmation) {
         client.sendChannel({}, msg, endpoint)
       }
     }
