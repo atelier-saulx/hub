@@ -112,22 +112,32 @@ const ThingInner = ({ mod = 0 }) => {
 
 const Thing = () => {
   const [mod, setMod] = useState(1)
+
+  const blax = useRpc(
+    {
+      endpoint: 'data',
+      method: 'complex',
+      minLoadTime: 1e3
+    },
+    { id: mod },
+    []
+  )
+
   return (
     <>
       <button
-        style={{
-          border: '1px solid red',
-          marginLeft: 100
-        }}
         onClick={() => {
-          setMod(mod + 1)
+          setMod(mod === 1 ? 0 : 1)
         }}
       >
-        Mod
+        SWITHCER
       </button>
-      <ThingInner mod={mod} />
+
+      {blax.map(val => mod)}
     </>
   )
+
+  // {/* <ThingInner mod={mod} /> */}
 }
 
 // const reducer = (s, v) => s + v

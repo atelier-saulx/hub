@@ -8,6 +8,19 @@ const { getLocal } = require('./getLocal')
 const defaultSend = (hub, props, receive, update) => {
   if (hub.socket) {
     hub.socket.rpc(props, update)
+
+    if (props.minLoadTime) {
+      clearTimeout(props._minLoadTime)
+
+      props._minLoadTime = setTimeout(() => {
+        props._minLoadTime = false
+        if (props._response) {
+          receive(hub, props, props._response, defaultReceive)
+          props._response = false
+        }
+      }, props.minLoadTime)
+    }
+
     if (props.timeout) {
       if (props._timer) {
         clearTimeout(props._timer)
@@ -33,8 +46,17 @@ const defaultReceive = (hub, props, response) => {
   }
 
   if (response === void 0) {
+    if (props._minLoadTime) {
+      clearTimeout(props._minLoadTime)
+      props._minLoadTime = false
+    }
     if (props.ready) props.ready(getLocal(hub, props))
   } else {
+    if (props._minLoadTime) {
+      props._response = response
+      return
+    }
+
     const { type = 'new', content, checksum, range } = response
     if (type === void 0 || content === void 0) {
       if (props.ready) props.ready(getLocal(hub, props))

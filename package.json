@@ -41,7 +41,7 @@
     "semi": false
   },
   "devDependencies": {
-    "@saulx/aristotle": "1.2.7",
+    "@saulx/aristotle": "1.2.8",
     "ava": "^0.25.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^7.0.0",
