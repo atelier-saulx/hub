@@ -9,28 +9,28 @@ const defaultSend = (hub, props, receive, update) => {
   if (hub.socket) {
     hub.socket.rpc(props, update)
 
-    if (props.store.minLoadTime) {
-      clearTimeout(props.store._minLoadTime)
+    if (props.minLoadTime) {
+      clearTimeout(props._minLoadTime)
 
-      props.store._minLoadTime = setTimeout(() => {
-        props.store._minLoadTime = false
-        if (props.store._response) {
-          receive(hub, props, props.store._response, defaultReceive)
-          props.store._response = false
+      props._minLoadTime = setTimeout(() => {
+        props._minLoadTime = false
+        if (props._response) {
+          receive(hub, props, props._response, defaultReceive)
+          props._response = false
         }
       }, props.minLoadTime)
     }
 
     if (props.timeout) {
-      if (props.store._timer) {
-        clearTimeout(props.store._timer)
+      if (props._timer) {
+        clearTimeout(props._timer)
       }
       if (props.onTimeout) {
-        props.store._timer = setTimeout(() => {
+        props._timer = setTimeout(() => {
           props.onTimeout(hub, props, receive, defaultReceive)
         }, props.timeout)
       } else {
-        props.store._timer = setTimeout(() => {
+        props._timer = setTimeout(() => {
           receive(hub, props, void 0, defaultReceive)
         }, props.timeout)
       }
@@ -42,19 +42,18 @@ const defaultSend = (hub, props, receive, update) => {
 
 const defaultReceive = (hub, props, response) => {
   if (props._timer) {
-    clearTimeout(props.store._timer)
+    clearTimeout(props._timer)
   }
 
   if (response === void 0) {
-    if (props.store._minLoadTime) {
-      // clearTimeout(props.store._minLoadTime)
-      // props.store._minLoadTime = false
-      return
+    if (props._minLoadTime) {
+      clearTimeout(props._minLoadTime)
+      props._minLoadTime = false
     }
     if (props.ready) props.ready(getLocal(hub, props))
   } else {
-    if (props.store._minLoadTime) {
-      props.store._response = response
+    if (props._minLoadTime) {
+      props._response = response
       return
     }
 
