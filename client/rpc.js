@@ -41,7 +41,7 @@ const defaultSend = (hub, props, receive, update) => {
 }
 
 const defaultReceive = (hub, props, response) => {
-  if (props._timer) {
+  if (props.store._timer) {
     clearTimeout(props.store._timer)
   }
 
