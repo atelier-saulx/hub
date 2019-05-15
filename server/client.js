@@ -107,6 +107,11 @@ class Client {
         dontSubscribe = true
       }
 
+      const hasEndpoint = !dontSend && (endpoint.content || endpoint.data)
+      if (!hasEndpoint) {
+        dontSubscribe = false
+      }
+
       if (!dontSubscribe) {
         let clientSubs = endpoint.subscriptions.get(this)
         if (!clientSubs) {
@@ -118,7 +123,7 @@ class Client {
         clientSubs.push(msg)
       }
 
-      if (!dontSend && (endpoint.content || endpoint.data)) {
+      if (hasEndpoint) {
         endpoint.send(endpoint, this, msg)
       } else if (dontSubscribe) {
         dontSubscribe = false
