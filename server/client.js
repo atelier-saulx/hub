@@ -64,6 +64,16 @@ class Client {
     })
     this.channels.clear()
   }
+  subscriptions(readable) {
+    return [...this.channels].map(([key, [endpoint, msg]]) => {
+      if (readable) {
+        return `${msg.endpoint}.${msg.method} args:${JSON.stringify(
+          msg.args || {}
+        )} checksum:${msg.checksum || ''} `
+      }
+      return msg
+    })
+  }
   close(channel, seq) {
     let subscription
     if (!channel && seq) {

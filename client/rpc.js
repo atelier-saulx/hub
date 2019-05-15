@@ -14,7 +14,9 @@ const defaultSend = (hub, props, receive, update) => {
       props._minLoadTime = setTimeout(() => {
         props._minLoadTime = false
         if (props._response) {
-          receive(hub, props, props._response, defaultReceive)
+          props._response.forEach(v => {
+            receive(hub, props, v, defaultReceive)
+          })
           props._response = false
         } else {
           if (props.ready) props.ready(getLocal(hub, props))
@@ -50,7 +52,11 @@ const defaultReceive = (hub, props, response) => {
   }
   if (props._minLoadTime) {
     if (response && response.content !== void 0) {
-      props._response = response
+      if (props._response) {
+        props._response.push(response)
+      } else {
+        props._response = [response]
+      }
     }
     return
   }
