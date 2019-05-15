@@ -10,12 +10,12 @@ const defaultSend = (hub, props, receive, update) => {
     hub.socket.rpc(props, update)
 
     if (props.minLoadTime) {
-      clearTimeout(props.store._minLoadTime)
-      props.store._minLoadTime = setTimeout(() => {
-        props.store._minLoadTime = false
-        if (props.store._response) {
-          receive(hub, props, props.store._response, defaultReceive)
-          props.store._response = false
+      clearTimeout(props._minLoadTime)
+      props._minLoadTime = setTimeout(() => {
+        props._minLoadTime = false
+        if (props._response) {
+          receive(hub, props, props._response, defaultReceive)
+          props._response = false
         } else {
           if (props.ready) props.ready(getLocal(hub, props))
         }
@@ -23,17 +23,17 @@ const defaultSend = (hub, props, receive, update) => {
     }
 
     if (props.timeout) {
-      if (props.store._timer) {
-        clearTimeout(props.store._timer)
+      if (props._timer) {
+        clearTimeout(props._timer)
       }
       if (props.onTimeout) {
-        props.store._timer = setTimeout(() => {
-          props.store._timer = false
+        props._timer = setTimeout(() => {
+          props._timer = false
           props.onTimeout(hub, props, receive, defaultReceive)
         }, props.timeout)
       } else {
-        props.store._timer = setTimeout(() => {
-          props.store._timer = false
+        props._timer = setTimeout(() => {
+          props._timer = false
           receive(hub, props, void 0, defaultReceive)
         }, props.timeout)
       }
@@ -44,13 +44,13 @@ const defaultSend = (hub, props, receive, update) => {
 }
 
 const defaultReceive = (hub, props, response) => {
-  if (props.store._timer) {
-    clearTimeout(props.store._timer)
-    props.store._timer = false
+  if (props._timer) {
+    clearTimeout(props._timer)
+    props._timer = false
   }
-  if (props.store._minLoadTime) {
+  if (props._minLoadTime) {
     if (response && response.content !== void 0) {
-      props.store._response = response
+      props._response = response
     }
     return
   }
