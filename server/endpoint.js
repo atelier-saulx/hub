@@ -114,12 +114,14 @@ class Endpoint {
     this.on('close', () => this.deferRemove(fn, time))
   }
   send(endpoint, client, msg) {
-    // console.log(
-    //   '\n $INCOMING',
-    //   Date.now() - (client.ldate ? client.ldate : 0),
-    //   msg,
-    //   client.subscriptions(true)
-    // )
+    if (endpoint.debug) {
+      console.log(
+        '\n $INCOMING',
+        Date.now() - (client.ldate ? client.ldate : 0),
+        msg,
+        client.subscriptions(true)
+      )
+    }
     client.ldate = Date.now()
     const rangeRequest = msg.range
     if (rangeRequest) {
@@ -182,7 +184,9 @@ class Endpoint {
         }
         msg.checksum = checksum
         if (content) {
-          console.log('SEND', type)
+          if (endpoint.debug) {
+            console.log('SEND', type)
+          }
 
           client.sendChannel(
             {
