@@ -60,6 +60,8 @@ const defaultReceive = (hub, props, response) => {
   } else {
     const { type = 'new', content, checksum, range } = response
     if (type === void 0 || content === void 0) {
+      // console.log('RECEIVE3')
+
       if (props.ready) props.ready(getLocal(hub, props))
     } else if (type === 'new') {
       if (props.store !== false) {
@@ -70,6 +72,7 @@ const defaultReceive = (hub, props, response) => {
           setLocal(hub, props, content)
         }
       }
+
       if (props.ready) props.ready(content)
     } else if (type === 'update') {
       if (props.store !== false) {
@@ -80,6 +83,7 @@ const defaultReceive = (hub, props, response) => {
           mergeLocal(hub, props, content)
         }
       }
+
       if (props.ready) props.ready(getLocal(hub, props))
     } else if (type === 'range') {
       if (props.store !== false) {
@@ -148,6 +152,9 @@ const defaultReceive = (hub, props, response) => {
           }
         }
       }
+
+      // console.log('RECEIVE6')
+
       if (props.ready) props.ready(getLocal(hub, props))
     }
   }

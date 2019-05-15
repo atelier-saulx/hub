@@ -168,8 +168,7 @@ class Endpoint {
             // eslint-disable-next-line
             endpoint.diff.from[1] == checksum
           ) {
-            console.log(endpoint.diff.from, checksum, msg.checksum)
-
+            // console.log(endpoint.diff.from, checksum, msg.checksum)
             content = endpoint.diff.content
             type = 'update'
           }

@@ -42,10 +42,14 @@ const setLocal = (hub, props, value, immediate) => {
 }
 
 const mergeLocal = (hub, props, value, immediate) => {
+  console.log('MERGE')
+
   const store = props.store
   let isUpdated
   const prev = store.v === void 0 ? props.default : store.v
   if (typeof value === 'object' && prev && typeof prev === 'object') {
+    console.log('MERGE')
+
     isUpdated = mergeObj(prev, value, true)
     value = prev
   }
