@@ -20,6 +20,7 @@ const { useHub, useRpc, Provider } = require('./react/hooks')
 var id = 0
 
 class Hub {
+  path = ''
   constructor(config) {
     this.id = ++id
     this.store = {}

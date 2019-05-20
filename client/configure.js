@@ -16,6 +16,11 @@ const configure = (hub, config) => {
     hub.isNode = typeof window === 'undefined'
   }
 
+  if (config.path) {
+    hub.path = config.path
+    delete config.path
+  }
+
   if (config.global) {
     const globalSettings = config.global
     if (globalSettings.on) {
