@@ -32,6 +32,7 @@ class Client {
       }
       this.socket.send(str)
     } else {
+      // console.log('SEND', this.ua, payload.seq, payload.channel)
       this.socket.send(JSON.stringify(payload))
     }
   }
@@ -62,6 +63,16 @@ class Client {
       }
     })
     this.channels.clear()
+  }
+  subscriptions(readable) {
+    return [...this.channels].map(([key, [endpoint, msg]]) => {
+      if (readable) {
+        return `${msg.endpoint}.${msg.method} args:${JSON.stringify(
+          msg.args || {}
+        )} checksum:${msg.checksum || ''} `
+      }
+      return msg
+    })
   }
   close(channel, seq) {
     let subscription
@@ -106,9 +117,8 @@ class Client {
         dontSubscribe = true
       }
 
-      if (!dontSend && (endpoint.content || endpoint.data)) {
-        endpoint.send(endpoint, this, msg)
-      } else if (dontSubscribe) {
+      const hasEndpoint = !dontSend && (endpoint.content || endpoint.data)
+      if (!hasEndpoint) {
         dontSubscribe = false
       }
 
@@ -121,6 +131,12 @@ class Client {
         msg.pendingChannel = ++this.channel
         this.channels.set(msg.pendingChannel, [endpoint, msg])
         clientSubs.push(msg)
+      }
+
+      if (hasEndpoint) {
+        endpoint.send(endpoint, this, msg)
+      } else if (dontSubscribe) {
+        dontSubscribe = false
       }
     } else {
       let clientSubs = endpoint.subscriptions.get(this)

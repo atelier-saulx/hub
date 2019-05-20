@@ -114,6 +114,15 @@ class Endpoint {
     this.on('close', () => this.deferRemove(fn, time))
   }
   send(endpoint, client, msg) {
+    if (endpoint.debug) {
+      console.log(
+        '\n $INCOMING',
+        Date.now() - (client.ldate ? client.ldate : 0),
+        msg,
+        client.subscriptions(true)
+      )
+    }
+    client.ldate = Date.now()
     const rangeRequest = msg.range
     if (rangeRequest) {
       if (endpoint.data) {
@@ -168,12 +177,17 @@ class Endpoint {
             // eslint-disable-next-line
             endpoint.diff.from[1] == checksum
           ) {
+            // console.log(endpoint.diff.from, checksum, msg.checksum)
             content = endpoint.diff.content
             type = 'update'
           }
         }
         msg.checksum = checksum
         if (content) {
+          if (endpoint.debug) {
+            console.log('SEND', type)
+          }
+
           client.sendChannel(
             {
               checksum,

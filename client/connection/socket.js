@@ -21,7 +21,7 @@ const handleIncoming = (socket, data) => {
 
   if (seq) {
     if (!socket.callbacks[seq]) {
-      // console.warn(`seq lost in traffic "${seq}"`)
+      console.warn(`seq lost in traffic "${seq}"`)
       return
     }
     const props = socket.callbacks[seq].props
