@@ -27,6 +27,9 @@ const deviceConfig = (hub, conf) => {
       send: false,
       history: {
         transform: (hub, value) => {
+          if (value.indexOf(hub.path) === 0) {
+            return value
+          }
           return hub.path + value
         },
         default: location()
