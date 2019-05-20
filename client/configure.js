@@ -43,6 +43,8 @@ const configure = (hub, config) => {
   } else {
     hub._config = config
   }
+
+  console.log(config)
 }
 
 module.exports = configure

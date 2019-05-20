@@ -7,7 +7,10 @@ const deviceConfig = hub => {
     device: {
       send: false,
       history: {
-        default: '/'
+        transform: (hub, value) => {
+          return hub.path + value
+        },
+        default: hub.path + '/'
       },
       type: {
         default: {
@@ -20,12 +23,14 @@ const deviceConfig = hub => {
     }
   }
 
-  hub.setServerRequest = (req, parsedUa) => {
+  hub.hub.setServerRequest = (req, parsedUa) => {
     /*
       parsed ua is in the format of { device, platform, browser, version }
     */
+
+    const url = req.url ? req.url.replace(hub.path, '') : ''
     if (req) {
-      hub.set('device.history', req.url)
+      hub.set('device.history', url)
       if (parsedUa) {
         hub.set('device.type', parsedUa)
       } else if (req.headers && req.headers['user-agent']) {
@@ -35,6 +40,11 @@ const deviceConfig = hub => {
   }
 
   hub.configure(config)
+
+  // hub.on('device.history', () => {
+
+  // })
+
   notifications(hub)
 }
 

@@ -13,7 +13,7 @@ class Link extends React.Component {
       {
         href: hub.path + to,
         onClick: e => {
-          hub.set('device.history', hub.path + to)
+          hub.set('device.history', to)
           e.stopPropagation()
           e.preventDefault()
         },
