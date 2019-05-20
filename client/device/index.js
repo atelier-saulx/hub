@@ -23,7 +23,7 @@ const deviceConfig = hub => {
     }
   }
 
-  hub.hub.setServerRequest = (req, parsedUa) => {
+  hub.setServerRequest = (req, parsedUa) => {
     /*
       parsed ua is in the format of { device, platform, browser, version }
     */
