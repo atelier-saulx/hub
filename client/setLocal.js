@@ -50,8 +50,6 @@ const mergeLocal = (hub, props, value, immediate) => {
     value = props.transform(hub, value)
   }
 
-  console.log('GO GO GO MERGE', props, value)
-
   const store = props.store
   let isUpdated
   const prev = store.v === void 0 ? props.default : store.v
