@@ -1,7 +1,7 @@
 const { WebSocketServer } = require('@clusterws/cws')
 const Client = require('./client')
 
-const createServer = (port, endpoints, ua) => {
+const createServer = (port, endpoints, ua, onConnection) => {
   const router =
     typeof endpoints === 'function'
       ? endpoints
@@ -23,7 +23,6 @@ const createServer = (port, endpoints, ua) => {
   const server = new WebSocketServer({ port }, () => {
     console.log('💫  hub-server listening on port:', port)
   })
-
   server.on('connection', (socket, upgReq) => {
     const client = new Client(socket)
 
@@ -32,6 +31,10 @@ const createServer = (port, endpoints, ua) => {
       if (ua) {
         client.ua = ua
       }
+    }
+
+    if (onConnection) {
+      onConnection(true, client)
     }
 
     client.address = socket._socket
@@ -47,14 +50,20 @@ const createServer = (port, endpoints, ua) => {
       })
     })
 
-    socket.on('close', (code, reason) => {
+    socket.on('close', () => {
       client.closed = true
       client.closeAll()
+      if (onConnection) {
+        onConnection(false, client)
+      }
     })
 
     // emitted on error
     socket.on('error', err => {
       console.log('oops something wrong', err)
+      if (onConnection) {
+        onConnection(false, client, err)
+      }
     })
 
     // emitted when pong comes back from the client connection
@@ -64,7 +73,7 @@ const createServer = (port, endpoints, ua) => {
     })
 
     // emitted when get ping from the server (if you send)
-    socket.on('ping', () => {})
+    // socket.on('ping', () => {})
 
     // this function accepts string or binary (node buffer)
     // socket.send(message)
