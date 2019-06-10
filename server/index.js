@@ -26,13 +26,13 @@ const createEndpoints = p => {
   return endpoints
 }
 
-exports.createServer = ({ port = 8080, ua, endpoints = '', clients }) => {
+exports.createServer = ({ port = 8080, ua, endpoints = '', onConnection }) => {
   // require('path').dirname(require.main.filename)
   // if not endpoint
   if (typeof endpoints === 'string' || !endpoints) {
     endpoints = createEndpoints(endpoints)
   }
   if (endpoints) {
-    return createServer(port, endpoints, ua, clients)
+    return createServer(port, endpoints, ua, onConnection)
   }
 }
