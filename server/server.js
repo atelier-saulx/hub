@@ -25,7 +25,7 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
 
       const app =
         key && cert
-          ? uws.App({
+          ? uws.SSLApp({
               key_file_name: key,
               cert_file_name: cert
             })
@@ -75,7 +75,7 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
           }
         })
         .any('/*', (res, req) => {
-          res.end('')
+          res.end('fun times')
         })
         .listen(port, listenSocket => {
           if (listenSocket) {
