@@ -1,4 +1,4 @@
-const uws = require('uWebSockets.js')
+const uws = require('../uWebSockets.js/uws')
 const Client = require('./client')
 
 const createServer = (port, endpoints, ua, onConnection, key, cert) =>
