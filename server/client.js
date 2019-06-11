@@ -40,9 +40,13 @@ class Client {
     payload.seq = msg.seq
     this.sendSocket(payload)
   }
-  getIp() {
+  getIp(type) {
     if (this.socket) {
-      return this.socket.getRemoteAddress()
+      if (type) {
+        return Buffer.from(this.socket.getRemoteAddress()).toString(type)
+      } else {
+        return this.socket.getRemoteAddress()
+      }
     } else {
       return ''
     }
