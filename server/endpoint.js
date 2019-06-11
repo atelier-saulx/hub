@@ -103,8 +103,6 @@ class Endpoint {
   removeIfEmpty(fn = this.remove, time = 2e3) {
     if (!this.timer) {
       this.timer = setTimeout(() => {
-        console.log('-----> removeIfEmpty', this.subscriptions.size)
-
         if (!this.subscriptions.size) {
           fn.call(this)
         }

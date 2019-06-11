@@ -2,19 +2,10 @@
 const Client = require('./client')
 const uws = require('uWebSockets.js')
 
-// const getIpString = ws => {
-//   let ip = ''
-//   new Uint8Array(ws.getRemoteAddress()).forEach(
-//     (a, i) => (ip += a.toString(16) + (i % 2 && i !== 15 ? ':' : ''))
-//   )
-//   return ip
-// }
-
 const createServer = (port, endpoints, ua, onConnection, key, cert) =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
       const enc = new TextDecoder('utf-8')
-
       const router =
         typeof endpoints === 'function'
           ? endpoints
@@ -82,9 +73,6 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
               onConnection(false, socket.client)
             }
             socket.client = null
-          },
-          error: () => {
-            console.log('error times')
           }
         })
         .any('/*', (res, req) => {
@@ -95,7 +83,7 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
             console.log('💫  hub-server listening on port:', port)
             resolve(listenSocket)
           } else {
-            console.log('Hub-Server error on port', port)
+            console.log('🤮  Hub-Server error on port', port)
             reject(new Error('Cannot start server on port ' + port))
           }
         })
