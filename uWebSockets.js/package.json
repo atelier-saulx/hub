@@ -1,5 +1,5 @@
 {
-  "main": "x.js",
-  "name": "@saulx/forkuws",
+  "main": "uws.js",
+  "name": "uWebSockets.js",
   "version": "0.0.1"
 }
