@@ -40,6 +40,13 @@ class Client {
     payload.seq = msg.seq
     this.sendSocket(payload)
   }
+  getIp() {
+    if (this.socket) {
+      return this.socket.getRemoteAddress()
+    } else {
+      return ''
+    }
+  }
   sendChannel(payload, msg) {
     if (msg.channel) {
       payload.channel = msg.channel
