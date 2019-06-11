@@ -72,6 +72,16 @@ class Hub {
     props = format(this, props, args)
     return getLocal(this, props)
   }
+  disconnect() {
+    if (this.socket) {
+      this.socket.disconnect()
+    }
+  }
+  reconnect() {
+    if (this.socket) {
+      this.socket.reconnect(this._url)
+    }
+  }
   getStore(props, args) {
     props = format(this, props, args)
     return getStore(this, props)

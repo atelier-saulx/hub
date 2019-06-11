@@ -18,10 +18,14 @@ const isConnected = hub => {
 
 const connect = (hub, url) => {
   if (hub.socket) {
-    if (url !== hub.socket.url) hub.socket.changeUrl(url)
+    // change url does not work well
+    if (url !== hub.socket.url && hub._url !== url) {
+      hub.socket.changeUrl(url)
+    }
   } else {
     hub.socket = new Socket(hub, url)
   }
+  hub._url = url
   return isConnected(hub)
 }
 

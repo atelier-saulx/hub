@@ -1,5 +1,6 @@
 const Emitter = require('./emitter')
 const connectWs = require('./websocket')
+
 const { defaultReceive } = require('../rpc')
 
 const handleIncoming = (socket, data) => {
@@ -158,15 +159,36 @@ class Socket extends Emitter {
     listen(this)
     this.connection = connectWs({}, this, url)
   }
+  disconnect() {
+    this.connection.closed = true
+    if (this.connection.ws) {
+      console.log('DISCONNECT')
+      this.connection.ws.close()
+    }
+  }
+  reconnect(url) {
+    if (url) {
+      this.connection.closed = true
+      if (this.connection.ws) {
+        this.connection.ws.close()
+      }
+      this.url = url
+      console.log('RECONNECT')
+      this.connection = connectWs({}, this, url)
+    }
+  }
   changeUrl(url) {
     this.connection.closed = true
     if (this.connection.ws) {
       this.connection.ws.close()
     }
-    this.connected = false
-    close(this)
-    this.url = url
-    this.connection = connectWs({}, this, url)
+
+    if (url) {
+      this.connected = false
+      close(this)
+      this.url = url
+      this.connection = connectWs({}, this, url)
+    }
   }
   sendQueue() {
     if (!this.inprogress) {
