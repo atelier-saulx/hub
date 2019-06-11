@@ -1,6 +1,5 @@
-// const { WebSocketServer } = require('uWebSockets.js')
-const Client = require('./client')
 const uws = require('uWebSockets.js')
+const Client = require('./client')
 
 const createServer = (port, endpoints, ua, onConnection, key, cert) =>
   new Promise((resolve, reject) => {

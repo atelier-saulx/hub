@@ -21,7 +21,7 @@ const createEndpoints = p => {
         })
       })
   } catch (err) {
-    console.error(`Problem with endpoints "${err.message}"`)
+    console.error(`\n\n\n🔥 Problem with endpoints "${err.message}" 🔥 \n\n\n`)
   }
   return endpoints
 }

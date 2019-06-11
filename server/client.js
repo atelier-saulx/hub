@@ -32,7 +32,6 @@ class Client {
       }
       this.socket.send(str)
     } else {
-      // console.log('SEND', this.ua, payload.seq, payload.channel)
       this.socket.send(JSON.stringify(payload))
     }
   }
@@ -97,7 +96,6 @@ class Client {
     } else {
       subscription = this.channels.get(channel)
     }
-    // console.log('CLOSE', channel, seq)
     if (subscription) {
       const [endpoint, msg] = subscription
       const subs = endpoint.subscriptions.get(this)
