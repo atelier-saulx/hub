@@ -34,7 +34,7 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
       app
         .ws('/*', {
           maxPayloadLength: 32 * 1024 * 1024,
-          idleTimeout: 10,
+          idleTimeout: 0,
           message: (socket, message) => {
             const decodedString = enc.decode(message)
             const messages = JSON.parse(decodedString)
