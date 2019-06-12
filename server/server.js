@@ -1,7 +1,7 @@
 const uws = require('../uWebSockets.js/uws')
 const Client = require('./client')
 
-const createServer = (port, endpoints, ua, onConnection, key, cert) =>
+const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
       const enc = new TextDecoder('utf-8')
@@ -38,6 +38,11 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
           message: (socket, message) => {
             const decodedString = enc.decode(message)
             const messages = JSON.parse(decodedString)
+
+            if (debug) {
+              console.log('---------> INCOMING', messages)
+            }
+
             messages.forEach(msg => {
               if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
                 socket.client.close(msg.channel, msg.seq)
@@ -47,6 +52,9 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
             })
           },
           open: (socket, req) => {
+            if (debug) {
+              console.log('--------> CONNECT CLIENT')
+            }
             const client = new Client(socket)
             socket.client = client
             if (ua) {
@@ -66,6 +74,10 @@ const createServer = (port, endpoints, ua, onConnection, key, cert) =>
           // console.log('WebSocket backpressure: ' + socket.getBufferedAmount())
           // },
           close: (socket, code, message) => {
+            if (debug) {
+              console.log('--------> REMOVE CLIENT')
+            }
+
             socket.client.closed = true
             socket.client.closeAll()
             if (onConnection) {

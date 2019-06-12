@@ -8,6 +8,9 @@ exports.Endpoint = Endpoint
 const createEndpoints = p => {
   const endpoints = {}
   p = p || path.join(path.dirname(require.main.filename), 'endpoints')
+
+  console.log('get ', p)
+
   try {
     const files = fs.readdirSync(p)
     files
@@ -32,12 +35,13 @@ exports.createServer = ({
   endpoints = '',
   onConnection,
   key,
-  cert
+  cert,
+  debug
 }) => {
   if (typeof endpoints === 'string' || !endpoints) {
     endpoints = createEndpoints(endpoints)
   }
   if (endpoints) {
-    return createServer(port, endpoints, ua, onConnection, key, cert)
+    return createServer(port, endpoints, ua, onConnection, key, cert, debug)
   }
 }
