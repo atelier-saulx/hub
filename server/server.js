@@ -58,11 +58,10 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
 
             if (ua) {
               client.ua = req.getHeader('user-agent')
-              const ip =
-                req.getHeader('x-real-ip') || req.getHeader('x-forwarded-for')
-              if (ip) {
-                client.ipv6 = ip
-              }
+              // const ip = req.getHeader('x-forwarded-for')
+              // if (ip) {
+              // client.ipv6 = ip
+              // }
             }
 
             if (onConnection) {
