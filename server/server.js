@@ -38,11 +38,9 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
           message: (socket, message) => {
             const decodedString = enc.decode(message)
             const messages = JSON.parse(decodedString)
-
             if (debug) {
               console.log('---------> INCOMING', messages)
             }
-
             messages.forEach(msg => {
               if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
                 socket.client.close(msg.channel, msg.seq)
@@ -70,19 +68,17 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
               onConnection(true, client)
             }
           },
-          // drain: socket => {
-          // console.log('WebSocket backpressure: ' + socket.getBufferedAmount())
-          // },
           close: (socket, code, message) => {
             if (debug) {
               console.log('--------> REMOVE CLIENT')
             }
-
+            socket.client.socket = null
             socket.client.closed = true
             socket.client.closeAll()
             if (onConnection) {
               onConnection(false, socket.client)
             }
+            socket.client.socket = null
             socket.client = null
           }
         })

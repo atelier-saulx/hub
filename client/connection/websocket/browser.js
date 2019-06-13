@@ -2,7 +2,6 @@ const maxReconnectionTime = 3000
 const urlLoader = require('./urlLoader')
 
 const connect = (holder, socket, url, time = 0, reconnect = false) => {
-  console.log('connect?')
   if (holder.closed) {
     return holder
   }
@@ -10,8 +9,6 @@ const connect = (holder, socket, url, time = 0, reconnect = false) => {
     if (holder.closed) {
       return holder
     }
-    console.log('connect + url', realUrl)
-
     setTimeout(() => {
       const ws = new global.WebSocket(realUrl)
       holder.ws = ws // can only have one ws connection for now
@@ -50,7 +47,6 @@ const connect = (holder, socket, url, time = 0, reconnect = false) => {
           return
         }
         if (socket.listeners.close) socket.listeners.close.forEach(fn => fn())
-        console.log('again?')
         connect(
           holder,
           socket,
