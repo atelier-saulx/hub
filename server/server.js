@@ -55,15 +55,16 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
             }
             const client = new Client(socket)
             socket.client = client
+
             if (ua) {
-              req.forEach((k, v) => {
-                if (k === 'user-agent') {
-                  if (v) {
-                    client.ua = v
-                  }
-                }
-              })
+              client.ua = client.getHeader('user-agent')
+              const ip =
+                req.getHeader('x-real-ip') || req.getHeader('x-forwarded-for')
+              if (ip) {
+                client.ipv6 = ip
+              }
             }
+
             if (onConnection) {
               onConnection(true, client)
             }

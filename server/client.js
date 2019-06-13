@@ -40,6 +40,10 @@ class Client {
     this.sendSocket(payload)
   }
   getIp(type) {
+    if (type === 'ipv6' && this.ipv6) {
+      return this.ipv6
+    }
+
     let ip =
       this.ip ||
       (this.ip = !this.closed && this.socket && this.socket.getRemoteAddress())
