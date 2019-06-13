@@ -40,7 +40,9 @@ class Client {
     this.sendSocket(payload)
   }
   getIp(type) {
-    let ip = this.ip || (this.socket && this.socket.getRemoteAddress())
+    let ip =
+      this.ip ||
+      (this.ip = !this.closed && this.socket && this.socket.getRemoteAddress())
 
     if (ip) {
       if (type === 'ipv6') {
@@ -49,7 +51,7 @@ class Client {
         }
         let ipv6 = ''
         new Uint8Array(ip).forEach(
-          (a, i) => (ipv6 += a.toString(16) + (i % 2 && i != 15 ? ':' : ''))
+          (a, i) => (ipv6 += a.toString(16) + (i % 2 && i !== 15 ? ':' : ''))
         )
         this.ipv6 = ipv6
         return ipv6
