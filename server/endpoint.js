@@ -1,4 +1,4 @@
-const murmur = require('murmurhash-native').murmurHash
+const murmur = require('saulx-murmur').murmurHash
 
 const sliceRange = (data, msg, force) => {
   const receivedRange = msg.receivedRange
