@@ -36,18 +36,30 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
           maxPayloadLength: 32 * 1024 * 1024,
           idleTimeout: 0,
           message: (socket, message) => {
-            const decodedString = enc.decode(message)
-            const messages = JSON.parse(decodedString)
-            if (debug) {
-              console.log('---------> INCOMING', messages)
-            }
-            messages.forEach(msg => {
-              if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
-                socket.client.close(msg.channel, msg.seq)
-              } else {
-                router(socket.client, msg)
+            let messages
+            try {
+              const decodedString = enc.decode(message)
+              messages = JSON.parse(decodedString)
+              if (debug) {
+                console.log('---------> INCOMING', messages)
               }
-            })
+            } catch (e) {
+              console.error(e)
+            }
+            if (messages) {
+              messages.forEach(msg => {
+                if (typeof msg === 'object') {
+                  if (
+                    msg.endpoint === 'channel' &&
+                    msg.method === 'unsubscribe'
+                  ) {
+                    socket.client.close(msg.channel, msg.seq)
+                  } else {
+                    router(socket.client, msg)
+                  }
+                }
+              })
+            }
           },
           open: (socket, req) => {
             if (debug) {
