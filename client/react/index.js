@@ -10,7 +10,10 @@ if (typeof window === 'undefined') {
   // tmp solution to remove warning
   // usefull to have a state on the server for e.g. dynamic imports
   console.error = function(...args) {
-    if (args[0].indexOf('Warning: setState(...):') === -1) {
+    if (
+      typeof args[0] !== 'string' ||
+      args[0].indexOf('Warning: setState(...):') === -1
+    ) {
       return log.apply(this, args)
     }
   }
