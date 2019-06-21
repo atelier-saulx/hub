@@ -8,10 +8,6 @@ const handleIncoming = (socket, data) => {
   let seq = data.seq
 
   if (socket.hub.debug) {
-    // if (!global.incoming) {
-    // global.incoming = []
-    // }
-    // global.incoming.push(JSON.parse(JSON.stringify(data)))
     console.log('Incoming:', JSON.parse(JSON.stringify(data)))
   }
 
@@ -48,9 +44,6 @@ const handleIncoming = (socket, data) => {
       delete socket.callbacks[seq]
     }
   } else if (hasChannel && data.channel !== 0) {
-    if (data.error) {
-      // console.error(data.error)
-    }
     const channelId = socket.channels[data.channel]
     if (channelId !== void 0) {
       if (!socket.subscriptions[socket.channels[data.channel]]) {
@@ -122,6 +115,7 @@ const listen = socket => {
     } else {
       handleIncoming(socket, data)
     }
+    socket.idleTimeout()
   })
 }
 
@@ -216,8 +210,19 @@ class Socket extends Emitter {
           this.queue = []
         }
         this.inprogress = false
+        this.idleTimeout()
       }, 50)
     }
+  }
+  idleTimeout() {
+    if (this.idlePing) {
+      clearTimeout(this.idlePing)
+    }
+    this.idlePing = setTimeout(() => {
+      if (this.connection && this.connected && !this.closed) {
+        this.connection.ws.send(1)
+      }
+    }, 60 * 1e3)
   }
   resendAllSubscriptions() {
     if (this.connected) {

@@ -33,8 +33,9 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
 
       app
         .ws('/*', {
-          maxPayloadLength: 32 * 1024 * 1024,
-          idleTimeout: 0,
+          maxPayloadLength: 1024 * 1024, // 1mb should be enough
+          idleTimeout: 100,
+          compression: 1,
           message: (socket, message) => {
             let messages
             try {
@@ -67,7 +68,6 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
             }
             const client = new Client(socket)
             socket.client = client
-
             if (ua) {
               client.ua = req.getHeader('user-agent')
               // const ip = req.getHeader('x-forwarded-for')
@@ -75,7 +75,6 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
               // client.ipv6 = ip
               // }
             }
-
             if (onConnection) {
               onConnection(true, client)
             }
