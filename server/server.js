@@ -37,15 +37,17 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
           idleTimeout: 100,
           compression: 1,
           message: (socket, message) => {
+            if (debug) {
+              console.log('--------> INCOMING', message)
+            }
             let messages
             try {
               const decodedString = enc.decode(message)
               messages = JSON.parse(decodedString)
-              if (debug) {
-                console.log('---------> INCOMING', messages)
-              }
             } catch (e) {
-              console.error(e)
+              if (debug) {
+                console.log('--------> ERROR PARSING JSON', e)
+              }
             }
             if (messages) {
               messages.forEach(msg => {
