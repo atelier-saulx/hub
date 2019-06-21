@@ -33,23 +33,36 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
 
       app
         .ws('/*', {
-          maxPayloadLength: 1024 * 1024 * 5, // 1mb should be enough
+          maxPayloadLength: 1024 * 1024 * 5, // 5mb should be more then enough
           idleTimeout: 100,
           compression: 1,
           message: (socket, message) => {
-            if (debug) {
-              console.log('--------> INCOMING', message)
-            }
             let messages
             try {
-              const decodedString = enc.decode(message)
-              messages = JSON.parse(decodedString)
-            } catch (e) {
+              const decoded = enc.decode(message)
               if (debug) {
-                console.log('--------> ERROR PARSING JSON', e)
+                console.log('INCOMING', socket._debugId, decoded)
+              }
+              if (decoded === '1') {
+                if (debug) {
+                  console.log('PING FROM CLIENT', socket._debugId)
+                }
+              } else {
+                try {
+                  messages = JSON.parse(decoded)
+                  console.log(messages)
+                } catch (err) {
+                  if (debug) {
+                    console.log('ERROR PARSING JSON', socket._debugId, err)
+                  }
+                }
+              }
+            } catch (err) {
+              if (debug) {
+                console.log('ERROR DECODING INCOMING', socket._debugId, err)
               }
             }
-            if (messages) {
+            if (messages && Array.isArray(messages)) {
               messages.forEach(msg => {
                 if (typeof msg === 'object') {
                   if (
@@ -66,7 +79,8 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
           },
           open: (socket, req) => {
             if (debug) {
-              console.log('--------> CONNECT CLIENT')
+              socket._debugId = Math.floor(Math.random() * 9999999).toString(16)
+              console.log('CONNECT CLIENT', socket._debugId)
             }
             const client = new Client(socket)
             socket.client = client
@@ -83,7 +97,7 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
           },
           close: (socket, code, message) => {
             if (debug) {
-              console.log('--------> REMOVE CLIENT')
+              console.log('--------> REMOVE CLIENT', socket._debugId)
             }
             socket.client.socket = null
             socket.client.closed = true

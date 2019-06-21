@@ -215,7 +215,7 @@ class Socket extends Emitter {
     }
   }
   idleTimeout() {
-    // const updateTime = 60 * 1e3
+    const updateTime = 60 * 1e3
     if (this.idlePing) {
       clearTimeout(this.idlePing)
     }
@@ -223,7 +223,7 @@ class Socket extends Emitter {
       if (this.connection && this.connected && !this.closed) {
         this.connection.ws.send(1)
       }
-    }, 1e3)
+    }, updateTime)
   }
   resendAllSubscriptions() {
     if (this.connected) {
