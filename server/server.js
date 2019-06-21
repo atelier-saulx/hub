@@ -33,7 +33,7 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
 
       app
         .ws('/*', {
-          maxPayloadLength: 1024 * 1024, // 1mb should be enough
+          maxPayloadLength: 1024 * 1024 * 5, // 1mb should be enough
           idleTimeout: 100,
           compression: 1,
           message: (socket, message) => {
