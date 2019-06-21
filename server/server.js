@@ -50,7 +50,6 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
               } else {
                 try {
                   messages = JSON.parse(decoded)
-                  console.log(messages)
                 } catch (err) {
                   if (debug) {
                     console.log('ERROR PARSING JSON', socket._debugId, err)

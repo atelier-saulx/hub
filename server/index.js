@@ -9,7 +9,7 @@ const createEndpoints = p => {
   const endpoints = {}
   p = p || path.join(path.dirname(require.main.filename), 'endpoints')
 
-  console.log('get ', p)
+  console.log('get endpoints from path ', p)
 
   try {
     const files = fs.readdirSync(p)
