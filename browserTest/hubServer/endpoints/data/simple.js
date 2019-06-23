@@ -6,7 +6,7 @@ const endpoint = new Endpoint()
 var cnt = 0
 setInterval(() => {
   cnt++
-  const totalData = Array.from(Array(1e4)).map((val, i) => {
+  const totalData = Array.from(Array(10)).map((val, i) => {
     return {
       realIndex: i,
       emoji: emojis[~~(Math.random() * emojis.length - 1)]
@@ -14,7 +14,7 @@ setInterval(() => {
   })
   endpoint.setData(totalData, cnt)
   endpoint.emit()
-}, 5e3)
+}, 1e3)
 
 module.exports = async (client, msg) => {
   console.log('receive', msg)

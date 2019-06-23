@@ -11,34 +11,62 @@ const totalData = Array.from(Array(50)).map((val, i) => {
   }
 })
 
-const client = createClient({
+const client = (global.hub = createClient({
   url: 'ws://localhost:6062'
-})
+}))
 
 // client.on('connect', s => {
 //   console.log('status:', s)
 // })
+const timeout = t =>
+  new Promise(resolve => {
+    setTimeout(() => {
+      resolve()
+    }, t || 500)
+  })
 
 client.debug = true
 
-client.set('device.list', totalData)
+const init = async () => {
+  // await timeout(Math.random() * 100)
+  const x = await client.rpc({
+    endpoint: 'data',
+    method: 'simple',
+    timeout: 2e3,
+    multiplex: true,
+    onTimeout: () => {
+      console.log('TIMEOUT')
+    }
+  })
 
-client.set(
-  {
-    method: 'a',
-    endpoint: 'device',
-    args: { method: 'a' }
-  },
-  'A!'
-)
-client.set(
-  {
-    method: 'a',
-    endpoint: 'device',
-    args: { method: 'b' }
-  },
-  'B!'
-)
+  if (x) {
+    console.log('x', x)
+  }
+}
+
+let i = 100
+while (i--) {
+  init()
+}
+
+// client.set('device.list', totalData)
+
+// client.set(
+//   {
+//     method: 'a',
+//     endpoint: 'device',
+//     args: { method: 'a' }
+//   },
+//   'A!'
+// )
+// client.set(
+//   {
+//     method: 'a',
+//     endpoint: 'device',
+//     args: { method: 'b' }
+//   },
+//   'B!'
+// )
 
 // client
 //   .rpc({
@@ -216,16 +244,16 @@ const Thing = () => {
 //   )
 // }
 
-const App = () => {
-  return (
-    <Provider hub={client}>
-      <Thing />
-    </Provider>
-  )
-}
+// const App = () => {
+//   return (
+//     <Provider hub={client}>
+//       <Thing />
+//     </Provider>
+//   )
+// }
 
-const d = document.createElement('div')
+// const d = document.createElement('div')
 
-ReactDOM.render(<App />, d)
+// ReactDOM.render(<App />, d)
 
-document.body.appendChild(d)
+// document.body.appendChild(d)

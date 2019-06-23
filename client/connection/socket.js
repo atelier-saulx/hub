@@ -37,6 +37,17 @@ const handleIncoming = (socket, data) => {
         sub.channel = channel
       }
       props.receive(socket.hub, props, data, defaultReceive)
+      if (props.multiplex) {
+        if (sub.on) {
+          sub.on.forEach(props => {
+            props.receive(socket.hub, props, data, defaultReceive)
+          })
+        }
+        if (sub.cnt === 0) {
+          console.log('remove sub')
+          socket.closeAll(props)
+        }
+      }
     } else if (data.error) {
       console.error('cannot find props:', data.error)
     }
@@ -235,15 +246,12 @@ class Socket extends Emitter {
       endpoint: 'channel',
       method: 'unsubscribe'
     }
-
     if (seq) {
       payload.seq = seq
     }
-
     if (subs.channel) {
       payload.channel = subs.channel
     }
-
     this.queue.push(payload)
     this.sendQueue()
   }
@@ -252,7 +260,9 @@ class Socket extends Emitter {
     if (subs) {
       if (this.connected && subs.channel && this.channels[subs.channel]) {
         delete this.channels[subs.channel]
-        this.unsubscribe(subs)
+        if (!subs.multiplex) {
+          this.unsubscribe(subs)
+        }
       } else if (subs.inProgress) {
         delete this.callbacks[subs.inProgress]
         let removed
@@ -265,7 +275,9 @@ class Socket extends Emitter {
           }
         }
         if (!removed) {
-          this.unsubscribe(subs, subs.inProgress)
+          if (!subs.multiplex) {
+            this.unsubscribe(subs, subs.inProgress)
+          }
         }
       }
       delete this.subscriptions[props.hash]
@@ -299,7 +311,7 @@ class Socket extends Emitter {
       payload.needConfirmation = true
     }
 
-    if (!isSubscriber) {
+    if (!isSubscriber || props.multiplex) {
       payload.noSubscription = true
     }
     if (props.store.checksum) {
@@ -309,7 +321,7 @@ class Socket extends Emitter {
     return payload
   }
   rpc(props, update) {
-    const isSubscriber = props.isSubscriber
+    const isSubscriber = props.isSubscriber || props.multiplex
     const hash = props.hash
     const sub = this.subscriptions[hash]
 
@@ -350,13 +362,28 @@ class Socket extends Emitter {
 
     if (isSubscriber) {
       if (!sub) {
-        this.subscriptions[hash] = { props, cnt: 1, inProgress: this.seq + 1 }
+        this.subscriptions[hash] = {
+          props,
+          cnt: props.multiplex ? 0 : 1,
+          inProgress: this.seq + 1
+        }
+        if (props.multiplex) {
+          this.subscriptions[hash].multiplex = true
+        }
         if (props.range) {
           props.store.inQueue = this.queue.length
         }
       } else {
-        sub.cnt++
-        props.receive(this.hub, props, void 0, defaultReceive)
+        if (!props.multiplex) {
+          sub.cnt++
+          props.receive(this.hub, props, void 0, defaultReceive)
+        } else {
+          // sub.
+          if (!sub.on) {
+            sub.on = []
+          }
+          sub.on.push(props)
+        }
         return
       }
     }
