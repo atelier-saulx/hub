@@ -43,10 +43,7 @@ const handleIncoming = (socket, data) => {
             props.receive(socket.hub, props, data, defaultReceive)
           })
         }
-        if (sub.cnt === 0) {
-          console.log('remove sub')
-          socket.closeAll(props)
-        }
+        socket.closeAll(props)
       }
     } else if (data.error) {
       console.error('cannot find props:', data.error)
