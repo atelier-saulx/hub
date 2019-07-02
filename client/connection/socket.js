@@ -229,7 +229,7 @@ class Socket extends Emitter {
     }
     this.idlePing = setTimeout(() => {
       if (this.connection && this.connected && !this.closed) {
-        this.connection.ws.send(1)
+        this.connection.ws.send('1')
       }
     }, updateTime)
   }
