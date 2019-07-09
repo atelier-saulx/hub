@@ -35,6 +35,7 @@ exports.createServer = ({
   endpoints = '',
   onConnection,
   key,
+  json,
   cert,
   debug
 }) => {
@@ -42,6 +43,15 @@ exports.createServer = ({
     endpoints = createEndpoints(endpoints)
   }
   if (endpoints) {
-    return createServer(port, endpoints, ua, onConnection, key, cert, debug)
+    return createServer(
+      port,
+      endpoints,
+      ua,
+      onConnection,
+      key,
+      cert,
+      debug,
+      json
+    )
   }
 }

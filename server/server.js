@@ -1,7 +1,16 @@
 const uws = require('../uWebSockets.js/uws')
 const Client = require('./client')
 
-const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
+const createServer = (
+  port,
+  endpoints,
+  ua,
+  onConnection,
+  key,
+  cert,
+  debug,
+  json
+) =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
       const enc = new TextDecoder('utf-8')
@@ -109,7 +118,10 @@ const createServer = (port, endpoints, ua, onConnection, key, cert, debug) =>
           }
         })
         .any('/*', (res, req) => {
-          res.end('fun times')
+          if (json) {
+          } else {
+            res.end('')
+          }
         })
         .listen(port, listenSocket => {
           if (listenSocket) {

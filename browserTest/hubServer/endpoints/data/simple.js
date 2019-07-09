@@ -20,3 +20,5 @@ module.exports = async (client, msg) => {
   console.log('receive', msg)
   client.subscribe(endpoint, msg)
 }
+
+// how to deal with a subscribe endpoint?
