@@ -71,6 +71,7 @@ const createServer = (
                   endpoint,
                   args,
                   method,
+                  seq: 1,
                   noSubscription: true
                 }
                 if (json(msg)) {
