@@ -63,7 +63,7 @@ const createServer = (
             })
             const path = url.split('/')
             if (path.length > 2) {
-              const endpoint = path[path.lenth - 2]
+              const endpoint = path[path.length - 2]
               const method = path[path.length - 1]
               const args = q ? querystring.parse(q) : void 0
               if (method && endpoint) {
