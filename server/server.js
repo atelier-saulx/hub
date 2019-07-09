@@ -1,5 +1,7 @@
 const uws = require('../uWebSockets.js/uws')
 const Client = require('./client')
+const pkg = require('../package.json')
+const querystring = require('querystring')
 
 const createServer = (
   port,
@@ -28,6 +30,7 @@ const createServer = (
                 const method = endpoint[msg.method]
                 if (method) {
                   method(client, msg)
+                  return true
                 }
               }
             }
@@ -39,6 +42,71 @@ const createServer = (
               cert_file_name: cert
             })
           : uws.App()
+
+      let restHandler
+      const version = 'v' + pkg.version
+
+      if (json) {
+        if (json === true) {
+          json = parsed => {
+            console.log(parsed)
+            return true
+          }
+        }
+        restHandler = async (res, req) => {
+          try {
+            let url = req.getUrl()
+            let q = req.getQuery()
+            let cUa = ua ? req.getHeader('user-agent') : ''
+            res.onAborted(() => {
+              res.aborted = true
+            })
+            const path = url.split('/')
+            if (path.length > 2) {
+              const endpoint = path[1]
+              const method = path[2]
+              const args = q ? querystring.parse(q) : void 0
+              if (method && endpoint) {
+                const msg = {
+                  endpoint,
+                  args,
+                  method,
+                  noSubscription: true
+                }
+                if (json(msg)) {
+                  const s = {
+                    send: reply => {
+                      res.end(reply)
+                    }
+                  }
+                  const client = new Client(s)
+                  if (ua) {
+                    client.ua = cUa
+                  }
+                  if (!router(client, msg)) {
+                    res.end('cannot find endpoint')
+                  }
+                } else {
+                  res.end('not a valid endpoint for json')
+                }
+              } else {
+                res.end(version)
+              }
+            } else {
+              res.end(version)
+            }
+          } catch (err) {
+            if (debug) {
+              console.error(err)
+              res.end('error')
+            }
+          }
+        }
+      } else {
+        restHandler = res => {
+          res.end(version)
+        }
+      }
 
       app
         .ws('/*', {
@@ -117,12 +185,7 @@ const createServer = (
             socket.client = null
           }
         })
-        .any('/*', (res, req) => {
-          if (json) {
-          } else {
-            res.end('')
-          }
-        })
+        .any('/*', restHandler)
         .listen(port, listenSocket => {
           if (listenSocket) {
             console.log('💫  hub-server listening on port:', port)
