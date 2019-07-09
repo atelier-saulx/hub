@@ -74,8 +74,12 @@ const createServer = (
                   seq: 1,
                   noSubscription: true
                 }
+
                 if (json(msg)) {
                   const s = {
+                    getRemoteAddress: () => {
+                      return res.getRemoteAddress()
+                    },
                     send: reply => {
                       res.end(reply)
                     }
