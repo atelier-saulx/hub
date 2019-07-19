@@ -1,5 +1,5 @@
 var WebSocket
-WebSocket = require('ws')
+WebSocket = require('../../../uWebSockets.js/uws.js')
 
 const urlLoader = require('./urlLoader')
 
