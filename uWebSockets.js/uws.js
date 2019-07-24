@@ -32,10 +32,6 @@ module.exports = (() => {
     process.on('exit', uWS.free)
     return uWS
   } catch (e) {
-    // console.error(
-    //   'This version of µWS is not compatible with your Node.js build:\n\n' +
-    //     e.toString()
-    // )
     throw new Error(
       'This version of µWS is not compatible with your Node.js build:\n\n' +
         e.toString()
