@@ -75,23 +75,23 @@ const deepNotEqual = (a, b) => {
   return false
 }
 
-const mergeObj = (a, b) => {
+const mergeObj = (a, b, k, p) => {
   let changed = false
   if (Array.isArray(a)) {
-    let arrayCorrection = 0
-    for (let key in b) {
-      let k = key * 1 - arrayCorrection
-      if (b[key] === null) {
-        arrayCorrection++
-        a.splice(k, 1)
-      } else {
+    if (Array.isArray(b) && b.length < a.length) {
+      p[k] = b
+      changed = true
+    } else {
+      let arrayCorrection = 0
+      for (let key in b) {
+        let k = key * 1 - arrayCorrection
         if (
           a[k] &&
           typeof a[k] === 'object' &&
           b[key] &&
           typeof b[key] === 'object'
         ) {
-          if (mergeObj(a[k], b[key])) {
+          if (mergeObj(a[k], b[key], k, a)) {
             changed = true
           }
         } else {
@@ -115,7 +115,7 @@ const mergeObj = (a, b) => {
         b[key] &&
         typeof b[key] === 'object'
       ) {
-        if (mergeObj(a[key], b[key])) {
+        if (mergeObj(a[key], b[key], key, a)) {
           changed = true
         }
       } else {

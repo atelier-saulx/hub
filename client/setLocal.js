@@ -57,6 +57,7 @@ const mergeLocal = (hub, props, value, immediate) => {
     isUpdated = mergeObj(prev, value, true)
     value = prev
   }
+
   const listeners = store.listeners
   if (listeners) {
     store.v = value
