@@ -49,7 +49,13 @@ const Something = () => {
 
   // handles unsubscribe / subscribe internally
   const myValue = useRpc('f.subscribe')
-  return <div>{myValue}</div>
+  
+  // local values are on endpoint device
+  const localValue = useRpc('device.value')
+
+  return <div
+    onClick={() => hub.set('device.value', Math.floor(Math.random() * 99))}
+  >{myValue} {localValue}</div>
 }
 
 const App = () => {
