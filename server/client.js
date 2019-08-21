@@ -32,13 +32,41 @@ class Client {
       }
       this.socket.send(str)
     } else {
-      // console.log('SEND', this.ua, payload.seq, payload.channel)
       this.socket.send(JSON.stringify(payload))
     }
   }
   send(payload, msg) {
     payload.seq = msg.seq
     this.sendSocket(payload)
+  }
+  getIp(type) {
+    if (type === 'ipv6' && this.ipv6) {
+      return this.ipv6
+    }
+
+    let ip =
+      this.ip ||
+      (this.ip = !this.closed && this.socket && this.socket.getRemoteAddress())
+
+    if (ip) {
+      if (type === 'ipv6') {
+        if (this.ipv6) {
+          return this.ipv6
+        }
+        let ipv6 = ''
+        new Uint8Array(ip).forEach(
+          (a, i) => (ipv6 += a.toString(16) + (i % 2 && i !== 15 ? ':' : ''))
+        )
+        this.ipv6 = ipv6
+        return ipv6
+      } else if (type) {
+        return Buffer.from(ip).toString(type)
+      } else {
+        return ip
+      }
+    } else {
+      return ''
+    }
   }
   sendChannel(payload, msg) {
     if (msg.channel) {
@@ -86,7 +114,6 @@ class Client {
     } else {
       subscription = this.channels.get(channel)
     }
-    // console.log('CLOSE', channel, seq)
     if (subscription) {
       const [endpoint, msg] = subscription
       const subs = endpoint.subscriptions.get(this)

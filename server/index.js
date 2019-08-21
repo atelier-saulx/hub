@@ -8,6 +8,9 @@ exports.Endpoint = Endpoint
 const createEndpoints = p => {
   const endpoints = {}
   p = p || path.join(path.dirname(require.main.filename), 'endpoints')
+
+  console.log('get endpoints from path ', p)
+
   try {
     const files = fs.readdirSync(p)
     files
@@ -21,18 +24,34 @@ const createEndpoints = p => {
         })
       })
   } catch (err) {
-    console.error(`Problem with endpoints "${err.message}"`)
+    console.error(`\n\n\n🔥 Problem with endpoints "${err.message}" 🔥 \n\n\n`)
   }
   return endpoints
 }
 
-exports.createServer = ({ port = 8080, ua, endpoints = '' }) => {
-  // require('path').dirname(require.main.filename)
-  // if not endpoint
+exports.createServer = ({
+  port = 8080,
+  ua,
+  endpoints = '',
+  onConnection,
+  key,
+  json,
+  cert,
+  debug
+}) => {
   if (typeof endpoints === 'string' || !endpoints) {
     endpoints = createEndpoints(endpoints)
   }
   if (endpoints) {
-    return createServer(port, endpoints, ua)
+    return createServer(
+      port,
+      endpoints,
+      ua,
+      onConnection,
+      key,
+      cert,
+      debug,
+      json
+    )
   }
 }

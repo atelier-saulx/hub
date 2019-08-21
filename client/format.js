@@ -47,6 +47,10 @@ const format = (hub, props, args, cb, hashed) => {
     }
   }
 
+  if (props.transform) {
+    result.transform = props.transform
+  }
+
   // config
   result = config(hub, result)
 

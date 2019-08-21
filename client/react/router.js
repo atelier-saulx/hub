@@ -11,7 +11,7 @@ class Link extends React.Component {
     return React.createElement(
       'a',
       {
-        href: to,
+        href: hub.path + to,
         onClick: e => {
           hub.set('device.history', to)
           e.stopPropagation()
@@ -65,7 +65,17 @@ class Route extends React.Component {
     }
   }
   render() {
-    const { data, path, exact, component, asyncComponent, hub } = this.props
+    const {
+      data,
+      path: inputPath,
+      exact,
+      component,
+      asyncComponent,
+      hub
+    } = this.props
+
+    const path = hub.path + inputPath
+
     const switchState = this.context.switchState
     if (switchState) {
       if (

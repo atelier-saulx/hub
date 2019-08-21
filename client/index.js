@@ -20,6 +20,7 @@ const { useHub, useRpc, Provider } = require('./react/hooks')
 var id = 0
 
 class Hub {
+  path = ''
   constructor(config) {
     this.id = ++id
     this.store = {}
@@ -70,6 +71,16 @@ class Hub {
   get(props, args) {
     props = format(this, props, args)
     return getLocal(this, props)
+  }
+  disconnect() {
+    if (this.socket) {
+      this.socket.disconnect()
+    }
+  }
+  reconnect() {
+    if (this.socket) {
+      this.socket.reconnect(this._url)
+    }
   }
   getStore(props, args) {
     props = format(this, props, args)

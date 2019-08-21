@@ -29,6 +29,10 @@ const emitChange = (hub, listeners, value, props, prev, immediate) => {
 }
 
 const setLocal = (hub, props, value, immediate) => {
+  if (props.transform) {
+    value = props.transform(hub, value)
+  }
+
   const store = props.store
   const listeners = store.listeners
   if (listeners) {
@@ -42,6 +46,10 @@ const setLocal = (hub, props, value, immediate) => {
 }
 
 const mergeLocal = (hub, props, value, immediate) => {
+  if (props.transform) {
+    value = props.transform(hub, value)
+  }
+
   const store = props.store
   let isUpdated
   const prev = store.v === void 0 ? props.default : store.v
@@ -49,6 +57,7 @@ const mergeLocal = (hub, props, value, immediate) => {
     isUpdated = mergeObj(prev, value, true)
     value = prev
   }
+
   const listeners = store.listeners
   if (listeners) {
     store.v = value

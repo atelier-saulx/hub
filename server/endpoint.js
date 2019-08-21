@@ -1,4 +1,4 @@
-const murmur = require('murmurhash-native').murmurHash
+const murmur = require('saulx-murmur').murmurHash
 
 const sliceRange = (data, msg, force) => {
   const receivedRange = msg.receivedRange
@@ -131,9 +131,9 @@ class Endpoint {
           if (data instanceof Set) {
             data = Array.from(data)
           } else if (data instanceof Map) {
-            data = Array.from(data.values())
+            data = Array.from(Object.values(data))
           } else if (data && typeof data === 'object') {
-            data = Array.from(data.values())
+            data = Array.from(Object.values(data))
           } else {
             endpoint.sendError(
               '🐓  When using range endpoint.data need to be an iterable',

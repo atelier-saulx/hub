@@ -1,90 +1,206 @@
-const { WebSocketServer } = require('@clusterws/cws')
+const uws = require('../uWebSockets.js/uws')
 const Client = require('./client')
+const pkg = require('../package.json')
+const querystring = require('querystring')
 
-const createServer = (port, endpoints, ua) => {
-  const router =
-    typeof endpoints === 'function'
-      ? endpoints
-      : (client, msg) => {
-          const token = msg.user_jwt || msg.token || msg.jwt
-          if (client.token !== token) {
-            client.token = token
-            client.userInfo = false
+const createServer = (
+  port,
+  endpoints,
+  ua,
+  onConnection,
+  key,
+  cert,
+  debug,
+  json
+) =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const enc = new TextDecoder('utf-8')
+      const router =
+        typeof endpoints === 'function'
+          ? endpoints
+          : (client, msg) => {
+              const token = msg.user_jwt || msg.token || msg.jwt
+              if (client.token !== token) {
+                client.token = token
+                client.userInfo = false
+              }
+              const endpoint = endpoints[msg.endpoint]
+              if (endpoint) {
+                const method = endpoint[msg.method]
+                if (method) {
+                  method(client, msg)
+                  return true
+                }
+              }
+            }
+
+      const app =
+        key && cert
+          ? uws.SSLApp({
+              key_file_name: key,
+              cert_file_name: cert
+            })
+          : uws.App()
+
+      let restHandler
+      const version = 'v' + pkg.version
+
+      if (json) {
+        if (json === true) {
+          json = parsed => {
+            console.log(parsed)
+            return true
           }
-          const endpoint = endpoints[msg.endpoint]
-          if (endpoint) {
-            const method = endpoint[msg.method]
-            if (method) {
-              method(client, msg)
+        }
+        restHandler = async (res, req) => {
+          try {
+            let url = req.getUrl()
+            let q = req.getQuery()
+            let cUa = ua ? req.getHeader('user-agent') : ''
+            res.onAborted(() => {
+              res.aborted = true
+            })
+            const path = url.split('/')
+            if (path.length > 2) {
+              const endpoint = path[path.length - 2]
+              const method = path[path.length - 1]
+              const args = q ? querystring.parse(q) : void 0
+              if (method && endpoint) {
+                const msg = {
+                  endpoint,
+                  args,
+                  method,
+                  seq: 1,
+                  noSubscription: true
+                }
+
+                if (json(msg)) {
+                  const s = {
+                    getRemoteAddress: () => {
+                      return res.getRemoteAddress()
+                    },
+                    send: reply => {
+                      res.end(reply)
+                    }
+                  }
+                  const client = new Client(s)
+                  if (ua) {
+                    client.ua = cUa
+                  }
+                  if (!router(client, msg)) {
+                    res.end('cannot find endpoint')
+                  }
+                } else {
+                  res.end('not a valid endpoint for json')
+                }
+              } else {
+                res.end(version)
+              }
+            } else {
+              res.end(version)
+            }
+          } catch (err) {
+            if (debug) {
+              console.error(err)
+              res.end('error')
             }
           }
         }
-
-  const server = new WebSocketServer({ port }, () => {
-    console.log('💫  hub-server listening on port:', port)
-  })
-
-  server.on('connection', (socket, upgReq) => {
-    const client = new Client(socket)
-
-    if (ua) {
-      const ua = upgReq.headers['user-agent']
-      if (ua) {
-        client.ua = ua
-      }
-    }
-
-    client.address = socket._socket
-
-    socket.on('message', msg => {
-      const messages = JSON.parse(msg)
-      messages.forEach(msg => {
-        if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
-          client.close(msg.channel, msg.seq)
-        } else {
-          router(client, msg)
+      } else {
+        restHandler = res => {
+          res.end(version)
         }
-      })
-    })
+      }
 
-    socket.on('close', (code, reason) => {
-      client.closed = true
-      client.closeAll()
-    })
-
-    // emitted on error
-    socket.on('error', err => {
-      console.log('oops something wrong', err)
-    })
-
-    // emitted when pong comes back from the client connection
-    socket.on('pong', () => {
-      // make sure to add below line (important to do not drop connections)
-      socket.isAlive = true
-    })
-
-    // emitted when get ping from the server (if you send)
-    socket.on('ping', () => {})
-
-    // this function accepts string or binary (node buffer)
-    // socket.send(message)
-
-    // destroy connection
-    // socket.terminate()
-
-    // close connection
-    // socket.close(code, reason)
-
-    // to manually send ping to the client
-    // socket.ping()
+      app
+        .ws('/*', {
+          maxPayloadLength: 1024 * 1024 * 5, // 5mb should be more then enough
+          idleTimeout: 100,
+          compression: 1,
+          message: (socket, message) => {
+            let messages
+            try {
+              const decoded = enc.decode(message)
+              if (debug) {
+                console.log('INCOMING', socket._debugId, decoded)
+              }
+              if (decoded === '1') {
+                if (debug) {
+                  console.log('PING FROM CLIENT', socket._debugId)
+                }
+              } else {
+                try {
+                  messages = JSON.parse(decoded)
+                } catch (err) {
+                  if (debug) {
+                    console.log('ERROR PARSING JSON', socket._debugId, err)
+                  }
+                }
+              }
+            } catch (err) {
+              if (debug) {
+                console.log('ERROR DECODING INCOMING', socket._debugId, err)
+              }
+            }
+            if (messages && Array.isArray(messages)) {
+              messages.forEach(msg => {
+                if (typeof msg === 'object') {
+                  if (
+                    msg.endpoint === 'channel' &&
+                    msg.method === 'unsubscribe'
+                  ) {
+                    socket.client.close(msg.channel, msg.seq)
+                  } else {
+                    router(socket.client, msg)
+                  }
+                }
+              })
+            }
+          },
+          open: (socket, req) => {
+            if (debug) {
+              socket._debugId = Math.floor(Math.random() * 9999999).toString(16)
+              console.log('CONNECT CLIENT', socket._debugId)
+            }
+            const client = new Client(socket)
+            socket.client = client
+            if (ua) {
+              client.ua = req.getHeader('user-agent')
+              // const ip = req.getHeader('x-forwarded-for')
+              // if (ip) {
+              // client.ipv6 = ip
+              // }
+            }
+            if (onConnection) {
+              onConnection(true, client)
+            }
+          },
+          close: (socket, code, message) => {
+            if (debug) {
+              console.log('--------> REMOVE CLIENT', socket._debugId)
+            }
+            socket.client.socket = null
+            socket.client.closed = true
+            socket.client.closeAll()
+            if (onConnection) {
+              onConnection(false, socket.client)
+            }
+            socket.client.socket = null
+            socket.client = null
+          }
+        })
+        .any('/*', restHandler)
+        .listen(port, listenSocket => {
+          if (listenSocket) {
+            console.log('💫  hub-server listening on port:', port)
+            resolve(listenSocket)
+          } else {
+            console.log('🤮  Hub-Server error on port', port)
+            reject(new Error('Cannot start server on port ' + port))
+          }
+        })
+    }, 500)
   })
-
-  server.startAutoPing(20000, false)
-
-  return server
-
-  // server.broadcast(message, options)
-  // server.close(callback)
-}
 
 module.exports = createServer

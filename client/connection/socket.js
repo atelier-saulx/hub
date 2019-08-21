@@ -1,5 +1,6 @@
 const Emitter = require('./emitter')
 const connectWs = require('./websocket')
+
 const { defaultReceive } = require('../rpc')
 
 const handleIncoming = (socket, data) => {
@@ -7,10 +8,6 @@ const handleIncoming = (socket, data) => {
   let seq = data.seq
 
   if (socket.hub.debug) {
-    // if (!global.incoming) {
-    // global.incoming = []
-    // }
-    // global.incoming.push(JSON.parse(JSON.stringify(data)))
     console.log('Incoming:', JSON.parse(JSON.stringify(data)))
   }
 
@@ -40,6 +37,14 @@ const handleIncoming = (socket, data) => {
         sub.channel = channel
       }
       props.receive(socket.hub, props, data, defaultReceive)
+      if (props.multiplex) {
+        if (sub.on) {
+          sub.on.forEach(props => {
+            props.receive(socket.hub, props, data, defaultReceive)
+          })
+        }
+        socket.closeAll(props)
+      }
     } else if (data.error) {
       console.error('cannot find props:', data.error)
     }
@@ -47,9 +52,6 @@ const handleIncoming = (socket, data) => {
       delete socket.callbacks[seq]
     }
   } else if (hasChannel && data.channel !== 0) {
-    if (data.error) {
-      // console.error(data.error)
-    }
     const channelId = socket.channels[data.channel]
     if (channelId !== void 0) {
       if (!socket.subscriptions[socket.channels[data.channel]]) {
@@ -121,6 +123,7 @@ const listen = socket => {
     } else {
       handleIncoming(socket, data)
     }
+    socket.idleTimeout()
   })
 }
 
@@ -158,15 +161,36 @@ class Socket extends Emitter {
     listen(this)
     this.connection = connectWs({}, this, url)
   }
+  disconnect() {
+    this.connection.closed = true
+    if (this.connection.ws) {
+      console.log('DISCONNECT')
+      this.connection.ws.close()
+    }
+  }
+  reconnect(url) {
+    if (url) {
+      this.connection.closed = true
+      if (this.connection.ws) {
+        this.connection.ws.close()
+      }
+      this.url = url
+      console.log('RECONNECT')
+      this.connection = connectWs({}, this, url)
+    }
+  }
   changeUrl(url) {
     this.connection.closed = true
     if (this.connection.ws) {
       this.connection.ws.close()
     }
-    this.connected = false
-    close(this)
-    this.url = url
-    this.connection = connectWs({}, this, url)
+
+    if (url) {
+      this.connected = false
+      close(this)
+      this.url = url
+      this.connection = connectWs({}, this, url)
+    }
   }
   sendQueue() {
     if (!this.inprogress) {
@@ -194,8 +218,20 @@ class Socket extends Emitter {
           this.queue = []
         }
         this.inprogress = false
+        this.idleTimeout()
       }, 50)
     }
+  }
+  idleTimeout() {
+    const updateTime = 60 * 1e3
+    if (this.idlePing) {
+      clearTimeout(this.idlePing)
+    }
+    this.idlePing = setTimeout(() => {
+      if (this.connection && this.connected && !this.closed) {
+        this.connection.ws.send('1')
+      }
+    }, updateTime)
   }
   resendAllSubscriptions() {
     if (this.connected) {
@@ -207,15 +243,12 @@ class Socket extends Emitter {
       endpoint: 'channel',
       method: 'unsubscribe'
     }
-
     if (seq) {
       payload.seq = seq
     }
-
     if (subs.channel) {
       payload.channel = subs.channel
     }
-
     this.queue.push(payload)
     this.sendQueue()
   }
@@ -224,7 +257,9 @@ class Socket extends Emitter {
     if (subs) {
       if (this.connected && subs.channel && this.channels[subs.channel]) {
         delete this.channels[subs.channel]
-        this.unsubscribe(subs)
+        if (!subs.multiplex) {
+          this.unsubscribe(subs)
+        }
       } else if (subs.inProgress) {
         delete this.callbacks[subs.inProgress]
         let removed
@@ -237,7 +272,9 @@ class Socket extends Emitter {
           }
         }
         if (!removed) {
-          this.unsubscribe(subs, subs.inProgress)
+          if (!subs.multiplex) {
+            this.unsubscribe(subs, subs.inProgress)
+          }
         }
       }
       delete this.subscriptions[props.hash]
@@ -271,7 +308,7 @@ class Socket extends Emitter {
       payload.needConfirmation = true
     }
 
-    if (!isSubscriber) {
+    if (!isSubscriber || props.multiplex) {
       payload.noSubscription = true
     }
     if (props.store.checksum) {
@@ -281,7 +318,7 @@ class Socket extends Emitter {
     return payload
   }
   rpc(props, update) {
-    const isSubscriber = props.isSubscriber
+    const isSubscriber = props.isSubscriber || props.multiplex
     const hash = props.hash
     const sub = this.subscriptions[hash]
 
@@ -322,13 +359,28 @@ class Socket extends Emitter {
 
     if (isSubscriber) {
       if (!sub) {
-        this.subscriptions[hash] = { props, cnt: 1, inProgress: this.seq + 1 }
+        this.subscriptions[hash] = {
+          props,
+          cnt: props.multiplex ? 0 : 1,
+          inProgress: this.seq + 1
+        }
+        if (props.multiplex) {
+          this.subscriptions[hash].multiplex = true
+        }
         if (props.range) {
           props.store.inQueue = this.queue.length
         }
       } else {
-        sub.cnt++
-        props.receive(this.hub, props, void 0, defaultReceive)
+        if (!props.multiplex) {
+          sub.cnt++
+          props.receive(this.hub, props, void 0, defaultReceive)
+        } else {
+          // sub.
+          if (!sub.on) {
+            sub.on = []
+          }
+          sub.on.push(props)
+        }
         return
       }
     }
