@@ -79,6 +79,30 @@ class Hub {
     props = format(this, props)
     return setLocal(this, props, value, immediate)
   }
+  countRefs() {
+    let components = 0
+    let set = 0
+    let fn = 0
+    for (let e in this.store) {
+      for (let x in this.store[e]) {
+        for (let m in this.store[e][x]) {
+          const t = this.store[e][x][m].listeners
+          if (t) {
+            if (t.fn) {
+              fn += t.fn.length
+            }
+            if (t.fnSet) {
+              set += t.fnSet.size
+            }
+            if (t.components) {
+              components += Object.keys(t.components).length
+            }
+          }
+        }
+      }
+    }
+    console.log('components', components, 'hooks', set, 'fn', fn)
+  }
   merge(props, value, immediate) {
     props = format(this, props)
     return mergeLocal(this, props, value, immediate)

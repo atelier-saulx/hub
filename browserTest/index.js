@@ -19,7 +19,7 @@ const client = createClient({
 //   console.log('status:', s)
 // })
 
-client.debug = true
+// client.debug = true
 
 client.set('device.list', totalData)
 
@@ -110,14 +110,35 @@ const ThingInner = ({ mod = 0 }) => {
   )
 }
 
+client.set('device.width', 100, true)
+
+reduce = (s, a) => {
+  return s === 1 ? 0 : 1
+}
+
 const Thing = () => {
-  const [mod, setMod] = useState(1)
+  const [mod, setMod] = useReducer(reduce, 1)
+  const [s, stop] = useState(0)
+  const hub = useHub()
+
+  useEffect(() => {
+    let cnt = 1000
+    let s = setInterval(() => {
+      cnt--
+      if (!cnt) {
+        clearInterval(s)
+      }
+      setMod()
+    }, 100)
+  }, [])
+
+  const maxWidth = hub.get('device.width') + 50
 
   const blax = useRpc(
     {
       endpoint: 'data',
       method: 'complex',
-      minLoadTime: 1e3
+      minLoadTime: 20
     },
     { id: mod },
     []
@@ -127,7 +148,7 @@ const Thing = () => {
     <>
       <button
         onClick={() => {
-          setMod(mod === 1 ? 0 : 1)
+          setMod(true)
         }}
       >
         SWITHCER
