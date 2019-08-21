@@ -22,6 +22,22 @@ const configure = (hub, config) => {
   }
 
   if (config.global) {
+    if (hub._config.global) {
+      if (hub._config.global.incoming && config.global.incoming) {
+        const p = hub.global.global.incoming
+        const p2 = hub._config.global.incoming
+        config.global.incoming = (hub, payload) => {
+          return p(hub, p2(hub, payload))
+        }
+      }
+      if (hub._config.global.send && config.global.send) {
+        const p = hub.global.global.send
+        const p2 = hub._config.global.send
+        config.global.send = (hub, payload) => {
+          return p(hub, p2(hub, payload))
+        }
+      }
+    }
     const globalSettings = config.global
     if (globalSettings.on) {
       globalSettings.on.forEach(val => {
