@@ -115,7 +115,6 @@ class Route extends React.Component {
     }
 
     if (match) {
-      console.log('?????????????????', match, switchState)
       if (switchState) {
         switchState.selected = path
       }

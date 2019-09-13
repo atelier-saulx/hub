@@ -16,6 +16,8 @@ const { close } = require('./close')
 const { deepNotEqual } = require('./util')
 const reset = require('./reset')
 const { useHub, useRpc, Provider } = require('./react/hooks')
+const extend = require('./extend')
+const localStorage = require('./localStorage')
 
 var id = 0
 
@@ -24,6 +26,7 @@ class Hub {
   constructor(config) {
     this.id = ++id
     this.store = {}
+    this.extensions = {}
     device(this, config)
     if (config) configure(this, config)
   }
@@ -57,8 +60,14 @@ class Hub {
       }
     })
   }
+  localStorage(props) {
+    return localStorage(this, props)
+  }
   configure(config) {
     configure(this, config)
+  }
+  extend(key, fn) {
+    extend(this, key, fn)
   }
   close(props, args, cb) {
     props = format(this, props, args, cb)
