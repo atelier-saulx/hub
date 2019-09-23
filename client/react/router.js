@@ -74,7 +74,11 @@ class Route extends React.Component {
       hub
     } = this.props
 
-    const path = hub.path + inputPath
+    let path = hub.path + inputPath
+
+    if (inputPath === '/' && hub.path) {
+      path = hub.path
+    }
 
     const switchState = this.context.switchState
     if (switchState) {
