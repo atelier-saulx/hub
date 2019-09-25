@@ -92,12 +92,15 @@ const defaultReceive = (hub, props, response) => {
 
       if (props.ready) props.ready(getLocal(hub, props))
     } else if (type === 'range') {
+      console.log('poop')
       if (props.store !== false) {
         if (response.error) {
           setLocal(hub, props, void 0)
         } else {
           if (checksum) props.store.checksum = checksum
           const changedContent = true // checksum !== props.store.checksum
+          console.log('poop', response.range, props.range)
+
           if (props.range && response.range) {
             if (response.range[1] < props.range[1]) {
               props.store.receivedLast = true
@@ -142,6 +145,7 @@ const defaultReceive = (hub, props, response) => {
                 emit(hub, props.store.listeners, props.store.v, props)
               }
             } else {
+              console.log(content)
               props.store.v = content
               emit(hub, props.store.listeners, props.store.v, props)
             }
@@ -153,6 +157,8 @@ const defaultReceive = (hub, props, response) => {
                 props.store.range[1] = response.range[1]
               }
             } else {
+              console.log('------>', props.store.v, response.range)
+
               props.store.range = response.range
             }
           }
