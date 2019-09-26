@@ -48,9 +48,10 @@ const configure = (hub, config) => {
         })
       })
     }
-    if (hub.globalSettings) {
-      console.log('allready got globalSettings might need to change!')
-    }
+    // if (hub.globalSettings) {
+    //   console.log(hub.globalSettings, globalSettings)
+    //   console.log('allready got globalSettings might need to change!')
+    // }
     hub.globalSettings = globalSettings
   }
 
