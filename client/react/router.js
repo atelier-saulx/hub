@@ -95,7 +95,10 @@ class Route extends React.Component {
     }
     if (!parsed[path]) {
       const keys = []
+
+      //  delimiter:
       const re = pathToRegexp(path, keys, { end: !!exact })
+
       parsed[path] = {
         re,
         keys
