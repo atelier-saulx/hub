@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect, useRef, useState } from 'react'
-import { createClient, useRpc, Provider, useHub } from '../client'
+import { createClient, useRpc, Provider, useHub, connect } from '../client'
 import ReactDOM from 'react-dom'
 
 const hub = createClient({
@@ -39,6 +39,21 @@ hub.configure({
 //   console.log(hub.get('data.diff'))
 // })
 
+const Flap = connect(
+  ({ data, hub }) => {
+    return (
+      <div
+        onClick={() => {
+          hub.set('device.flap', !data)
+        }}
+      >
+        {data ? 'flap' : 'no flap'}
+      </div>
+    )
+  },
+  'device.flap'
+)
+
 const List = () => {
   const d = useRpc('data.diff', void 0, {})
   if (!d.a) {
@@ -64,7 +79,7 @@ const List = () => {
 const App = () => {
   return (
     <Provider hub={hub}>
-      <List />
+      <Flap />
     </Provider>
   )
 }

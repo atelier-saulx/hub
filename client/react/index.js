@@ -41,12 +41,10 @@ ConnectedComponent.contextTypes = {
 }
 
 class BaseComponent extends ConnectedComponent {
-  constructor() {
-    super()
+  constructor(props, context) {
+    super(props, context)
     this.state = {}
     this.uid = ++uid
-  }
-  componentWillMount() {
     subscribe(this)
     if (this.response) {
       this.updated = true
