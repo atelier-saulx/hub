@@ -66,7 +66,6 @@ exports.createServer = function({
         if (fs.existsSync(path.join(dir, p))) {
           from = path.join(dir, p)
         } else {
-          console.log('??xxx?', resolveFrom(dir, p))
           from = path.dirname(resolveFrom(dir, p))
         }
 
