@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
-    "saulx-murmur": "0.0.2",
+    "saulx-murmur": "0.0.4",
     "path-to-regexp": "^2.2.1",
     "prop-types": "^15.6.1",
     "query-string": "^6.4.2",
