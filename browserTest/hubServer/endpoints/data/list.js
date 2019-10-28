@@ -16,7 +16,7 @@ const d = () => {
   endpoint.setData(totalData, cnt)
   endpoint.emit()
 
-  console.log(endpoint.subscriptions)
+  // console.log(endpoint.subscriptions)
 }
 
 setInterval(d, 5e3)

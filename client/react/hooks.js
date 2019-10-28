@@ -40,7 +40,12 @@ const hookFormat = (hub, props, args, hashed) => {
   }
   props.hash = hashed || hash(props)
   config(hub, props)
+
   props.store = getStore(hub, props)
+
+  if (props.onTimeout) {
+    props.store._needConfirmation = true
+  }
   return props
 }
 
@@ -65,7 +70,6 @@ const isNode = typeof window === 'undefined'
 
 // var cnt = 0
 exports.useRpc = (subscription, args, defaultValue) => {
-  // console.log('useRpc now - ', ++cnt) // subscription
   const hub = useContext(HubContext)
   let [result, update] = useState({})
   const ref = useRef({ parsed: false, range: false, id: false })
@@ -123,29 +127,27 @@ exports.useRpc = (subscription, args, defaultValue) => {
     previous.id = subscription
   }
   if (!isNode) {
-    useEffect(
-      () => {
-        if (subscription) {
-          if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
-          previous.parsed = parsed
-          if (parsed.range) {
-            previous.range = parsed.range
-          }
-          parsed.isSubscriber = true
-          parsed.id = id
-          parsed.fromHook = true
-          parsed.onChange = update
-
-          if (!hub.isNode) {
-            internalRpc(hub, parsed)
-          }
-          return () => {
-            close(hub, previous.parsed)
-          }
+    useEffect(() => {
+      if (subscription) {
+        if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
+        previous.parsed = parsed
+        if (parsed.range) {
+          previous.range = parsed.range
         }
-      },
-      [id]
-    )
+        parsed.isSubscriber = true
+        parsed.id = id
+        parsed.fromHook = true
+
+        parsed.onChange = update
+
+        if (!hub.isNode) {
+          internalRpc(hub, parsed)
+        }
+        return () => {
+          close(hub, previous.parsed)
+        }
+      }
+    }, [id])
   }
   return result === void 0 || result.v === void 0 ? defaultValue : result.v
 }

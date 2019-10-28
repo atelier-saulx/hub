@@ -304,7 +304,7 @@ class Socket extends Emitter {
       }
     }
 
-    if (props.timeout) {
+    if (props.timeout || props.store._needConfirmation) {
       payload.needConfirmation = true
     }
 

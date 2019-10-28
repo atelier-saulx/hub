@@ -16,6 +16,8 @@ const { close } = require('./close')
 const { deepNotEqual } = require('./util')
 const reset = require('./reset')
 const { useHub, useRpc, Provider } = require('./react/hooks')
+const extend = require('./extend')
+const localStorage = require('./localStorage')
 
 var id = 0
 
@@ -24,6 +26,7 @@ class Hub {
   constructor(config) {
     this.id = ++id
     this.store = {}
+    this.extensions = {}
     device(this, config)
     if (config) configure(this, config)
   }
@@ -57,8 +60,14 @@ class Hub {
       }
     })
   }
+  localStorage(props) {
+    return localStorage(this, props)
+  }
   configure(config) {
     configure(this, config)
+  }
+  extend(key, fn) {
+    extend(this, key, fn)
   }
   close(props, args, cb) {
     props = format(this, props, args, cb)
@@ -89,6 +98,30 @@ class Hub {
   set(props, value, immediate) {
     props = format(this, props)
     return setLocal(this, props, value, immediate)
+  }
+  countRefs() {
+    let components = 0
+    let set = 0
+    let fn = 0
+    for (let e in this.store) {
+      for (let x in this.store[e]) {
+        for (let m in this.store[e][x]) {
+          const t = this.store[e][x][m].listeners
+          if (t) {
+            if (t.fn) {
+              fn += t.fn.length
+            }
+            if (t.fnSet) {
+              set += t.fnSet.size
+            }
+            if (t.components) {
+              components += Object.keys(t.components).length
+            }
+          }
+        }
+      }
+    }
+    console.log('components', components, 'hooks', set, 'fn', fn)
   }
   merge(props, value, immediate) {
     props = format(this, props)

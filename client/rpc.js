@@ -33,6 +33,9 @@ const defaultSend = (hub, props, receive, update) => {
           props._timer = false
           props.onTimeout(hub, props, receive, defaultReceive)
         }, props.timeout)
+        if (props.store) {
+          props.store._timer = props._timer
+        }
       } else {
         props._timer = setTimeout(() => {
           props._timer = false
@@ -47,8 +50,15 @@ const defaultSend = (hub, props, receive, update) => {
 
 const defaultReceive = (hub, props, response) => {
   if (props._timer) {
+    if (props.store && props.store._timer === props._timer) {
+      props.store._timer = false
+    }
     clearTimeout(props._timer)
     props._timer = false
+  }
+  if (props.store && props.store._timer) {
+    clearTimeout(props.store._timer)
+    props.store._timer = false
   }
   if (props._minLoadTime) {
     if (response && response.content !== void 0) {
@@ -98,6 +108,7 @@ const defaultReceive = (hub, props, response) => {
         } else {
           if (checksum) props.store.checksum = checksum
           const changedContent = true // checksum !== props.store.checksum
+
           if (props.range && response.range) {
             if (response.range[1] < props.range[1]) {
               props.store.receivedLast = true

@@ -11,6 +11,10 @@ class Client {
     this.authCheck = authCheck
   }
   sendSocket(payload) {
+    if (!this.socket) {
+      console.error('client is allready removed - cannot send data')
+      return
+    }
     // optimization allowing for caching of stringified content
     if (typeof payload.content === 'string') {
       let str

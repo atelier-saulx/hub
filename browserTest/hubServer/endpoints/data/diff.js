@@ -32,11 +32,11 @@ setInterval(() => {
   if (history[history.length - 2]) {
     const diffResult = diff(history[history.length - 2], content)
 
-    console.log(
-      'yes',
-      JSON.stringify(content, false, 2),
-      JSON.stringify(diffResult, false, 2)
-    )
+    // console.log(
+    //   'yes',
+    //   JSON.stringify(content, false, 2),
+    //   JSON.stringify(diffResult, false, 2)
+    // )
 
     const diffParsed = {
       from: [cnt - 1, cnt],
