@@ -28,10 +28,12 @@ class Hub {
     this.id = ++id
     this.store = {}
     this.extensions = {}
-    this.session = djb2(
-      Date.now() +
-        ~~(Math.random() * 999999999) +
-        (global.navigator ? global.navigator.userAgent : 'app')
+    this.session = (
+      djb2(
+        Date.now() +
+          ~~(Math.random() * 999999999) +
+          (global.navigator ? global.navigator.userAgent : 'app')
+      ) >>> 0
     ).toString(16)
     device(this, config)
     if (config) configure(this, config)
