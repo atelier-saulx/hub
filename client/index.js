@@ -18,7 +18,7 @@ const reset = require('./reset')
 const { useHub, useRpc, Provider } = require('./react/hooks')
 const extend = require('./extend')
 const localStorage = require('./localStorage')
-const { hash } = require('./hash')
+const { djb2 } = require('./hash')
 
 var id = 0
 
@@ -28,7 +28,7 @@ class Hub {
     this.id = ++id
     this.store = {}
     this.extensions = {}
-    this.session = hash(
+    this.session = djb2(
       Date.now() +
         ~~(Math.random() * 999999999) +
         (global.navigator ? global.navigator.userAgent : 'app')
