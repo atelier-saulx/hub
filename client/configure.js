@@ -1,18 +1,16 @@
 const { connect } = require('./connection')
-// const { mergeObj } = require('./util')
 
-const mergeObj = (target, source) => {
-  const t = typeof source
-  if (t === 'undefined') {
-    return target
+const merge = (prev, next) => {
+  if (
+    typeof next === 'object' &&
+    typeof prev === 'object' &&
+    next !== null &&
+    prev !== null
+  ) {
+    for (const i in next) prev[i] = merge(prev[i], next[i])
+    return prev
   }
-  if (t === 'object' && target && typeof target === 'object') {
-    for (let i in source) {
-      target[i] = mergeObj(target[i], source[i])
-    }
-    return target
-  }
-  return source
+  return next === undefined ? prev : next
 }
 
 const configure = (hub, config) => {
@@ -62,15 +60,11 @@ const configure = (hub, config) => {
         })
       })
     }
-    // if (hub.globalSettings) {
-    //   console.log(hub.globalSettings, globalSettings)
-    //   console.log('allready got globalSettings might need to change!')
-    // }
-    hub.globalSettings = mergeObj(hub.globalSettings, globalSettings)
+    hub.globalSettings = merge(hub.globalSettings, globalSettings)
   }
 
   if (hub._config) {
-    mergeObj(hub._config, config)
+    merge(hub._config, config)
   } else {
     hub._config = config
   }
