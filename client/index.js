@@ -18,6 +18,7 @@ const reset = require('./reset')
 const { useHub, useRpc, Provider } = require('./react/hooks')
 const extend = require('./extend')
 const localStorage = require('./localStorage')
+const { hash } = require('./hash')
 
 var id = 0
 
@@ -27,6 +28,11 @@ class Hub {
     this.id = ++id
     this.store = {}
     this.extensions = {}
+    this.session = hash(
+      Date.now() +
+        ~~(Math.random() * 999999999) +
+        (global.navigator ? global.navigator.userAgent : 'app')
+    ).toString(16)
     device(this, config)
     if (config) configure(this, config)
   }
