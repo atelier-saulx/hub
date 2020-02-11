@@ -39,42 +39,17 @@ hub.configure({
 //   console.log(hub.get('data.diff'))
 // })
 
-const Flap = connect(
-  ({ data, hub }) => {
-    return (
-      <div
-        onClick={() => {
-          hub.set('device.flap', !data)
-        }}
-      >
-        {data ? 'flap' : 'no flap'}
-      </div>
-    )
-  },
-  'device.flap'
-)
-
-const List = () => {
-  const d = useRpc('data.diff', void 0, {})
-  if (!d.a) {
-    return 'loading...'
-  }
+const Flap = connect(({ data, hub }) => {
   return (
-    <>
-      <pre>{JSON.stringify(d, false, 2)}</pre>
-      {d.a[1].items.map((v, i) => (
-        <div
-          key={i}
-          style={{
-            marginTop: 20
-          }}
-        >
-          {v.name}
-        </div>
-      ))}
-    </>
+    <div
+      onClick={() => {
+        hub.set('device.flap', !data)
+      }}
+    >
+      {data ? 'flap' : 'no flap'}
+    </div>
   )
-}
+}, 'data.simple')
 
 const App = () => {
   return (

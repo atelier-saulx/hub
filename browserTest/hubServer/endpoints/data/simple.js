@@ -14,10 +14,10 @@ setInterval(() => {
   })
   endpoint.setData(totalData, cnt)
   endpoint.emit()
-}, 1e3)
+}, 10e3)
 
 module.exports = async (client, msg) => {
-  // console.log('receive', msg)
+  console.log('receive', msg)
   client.subscribe(endpoint, msg)
 }
 

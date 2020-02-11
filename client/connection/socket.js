@@ -76,7 +76,7 @@ const close = socket => {
   }
 }
 
-const sendSubscription = (socket, force) => {
+const sendSubscription = (socket, force, isReconnect) => {
   const subs = socket.subscriptions
   for (let key in subs) {
     if (!subs[key].inProgress || force) {
@@ -98,6 +98,9 @@ const sendSubscription = (socket, force) => {
       if (props.store && props.store.checksum) {
         payload.checksum = props.store.checksum
       }
+      if (isReconnect) {
+        payload.isReconnect = isReconnect
+      }
       socket.queue.push(payload)
       subs[key].inProgress = socket.seq
       socket.callbacks[socket.seq] = { props }
@@ -110,8 +113,12 @@ const listen = socket => {
   socket.on('close', data => close(socket))
 
   socket.on('open', data => {
-    if (socket.closed) socket.closed = false
-    sendSubscription(socket)
+    if (socket.closed) {
+      socket.closed = false
+      sendSubscription(socket, false, true)
+    } else {
+      sendSubscription(socket)
+    }
   })
 
   socket.on('data', data => {
@@ -206,7 +213,7 @@ class Socket extends Emitter {
               }
             }
             if (this.hub.debug) {
-              console.log('Outgoing:', queue)
+              console.trace('Outgoing:', queue)
             }
             this.connection.ws.send(JSON.stringify(queue))
           } else {

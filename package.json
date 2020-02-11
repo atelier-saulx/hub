@@ -9,7 +9,7 @@
     "watch": "ava --verbose --watch",
     "update-test": "ava --update-snapshots",
     "browser-server": "nodemon browserTest/hubServer",
-    "browser": "NODE_ENV=production aristotle browserTest"
+    "browser": "aristotle browserTest"
   },
   "browser": {
     "./client/connection/websocket": "./client/connection/websocket/browser.js",
