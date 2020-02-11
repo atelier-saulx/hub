@@ -213,7 +213,7 @@ class Socket extends Emitter {
               }
             }
             if (this.hub.debug) {
-              console.trace('Outgoing:', queue)
+              console.log('Outgoing:', queue)
             }
             this.connection.ws.send(JSON.stringify(queue))
           } else {
