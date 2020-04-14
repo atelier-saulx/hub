@@ -3,7 +3,7 @@ const { connect } = require('./index')
 const PropTypes = require('prop-types')
 const qs = require('query-string')
 // adds 3kb to project
-const pathToRegexp = require('path-to-regexp')
+const { pathToRegexp } = require('path-to-regexp')
 
 class Link extends React.Component {
   render() {
@@ -75,7 +75,6 @@ class Route extends React.Component {
     } = this.props
 
     let path = hub.path + inputPath
-
     if (inputPath === '/' && hub.path) {
       path = hub.path
     }
@@ -95,10 +94,7 @@ class Route extends React.Component {
     }
     if (!parsed[path]) {
       const keys = []
-
-      //  delimiter:
       const re = pathToRegexp(path, keys, { end: !!exact })
-
       parsed[path] = {
         re,
         keys
