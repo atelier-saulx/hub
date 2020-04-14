@@ -10,6 +10,7 @@ const createEndpoints = p => {
   const endpoints = {}
   p = p || path.join(path.dirname(require.main.filename), 'endpoints')
   console.log('get endpoints from path ', p)
+  const last = { method: '', endpoint: '' }
   try {
     const files = fs.readdirSync(p)
     files
@@ -18,12 +19,18 @@ const createEndpoints = p => {
         const methods = fs.readdirSync(path.join(p, endpoint))
         endpoints[endpoint] = {}
         methods.forEach(method => {
+          last.method = method
+          last.endpoint = endpoint
           method = method.replace(/\.js$/, '')
           endpoints[endpoint][method] = require(path.join(p, endpoint, method))
         })
       })
   } catch (err) {
-    console.error(`\n\n\n🔥 Problem with endpoints "${err.message}" 🔥 \n\n\n`)
+    console.error(
+      `\n\n\n🔥 Problem with endpoints "${err.message}" ${last.endpoint}/${
+        last.method
+      } 🔥 \n\n\n`
+    )
   }
   return endpoints
 }
