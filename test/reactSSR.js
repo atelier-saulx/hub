@@ -8,14 +8,11 @@ test('ssr', t => {
 
   client.set('device.showCats', true)
 
-  const ShowCats = connect(
-    ({ data }) => {
-      return data
-        ? React.createElement('div', {}, 'cats')
-        : React.createElement('div', {}, 'no cats!')
-    },
-    'device.showCats'
-  )
+  const ShowCats = connect(({ data }) => {
+    return data
+      ? React.createElement('div', {}, 'cats')
+      : React.createElement('div', {}, 'no cats!')
+  }, 'device.showCats')
 
   const App = () => {
     return React.createElement(

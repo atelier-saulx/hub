@@ -27,19 +27,13 @@ test('.on advanced', t => {
     }
   })
 
-  const Simple2 = connect(
-    ({ data }) => {
-      return React.createElement('div', {}, data)
-    },
-    'smur.meth2'
-  )
+  const Simple2 = connect(({ data }) => {
+    return React.createElement('div', {}, data)
+  }, 'smur.meth2')
 
-  const Simple = connect(
-    ({ data }) => {
-      return React.createElement('div', {}, data)
-    },
-    'smur.meth1'
-  )
+  const Simple = connect(({ data }) => {
+    return React.createElement('div', {}, data)
+  }, 'smur.meth1')
 
   const App = () => {
     return React.createElement(
@@ -84,12 +78,9 @@ test('configure .on option and render', async t => {
     }
   })
 
-  const Simple = connect(
-    ({ data }) => {
-      return React.createElement('div', {}, data)
-    },
-    'user.profile'
-  )
+  const Simple = connect(({ data }) => {
+    return React.createElement('div', {}, data)
+  }, 'user.profile')
 
   const App = () => {
     return React.createElement(
@@ -121,21 +112,15 @@ test('unsubscribe', async t => {
     }
   })
 
-  const Simple = connect(
-    ({ data }) => {
-      return React.createElement('div', {}, data)
-    },
-    'animals.cats'
-  )
+  const Simple = connect(({ data }) => {
+    return React.createElement('div', {}, data)
+  }, 'animals.cats')
 
-  const ShowCats = connect(
-    ({ data }) => {
-      return data
-        ? React.createElement(Simple)
-        : React.createElement('div', {}, 'no cats!')
-    },
-    'device.showCats'
-  )
+  const ShowCats = connect(({ data }) => {
+    return data
+      ? React.createElement(Simple)
+      : React.createElement('div', {}, 'no cats!')
+  }, 'device.showCats')
 
   const App = () => {
     return React.createElement(

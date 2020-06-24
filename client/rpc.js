@@ -76,8 +76,6 @@ const defaultReceive = (hub, props, response) => {
   } else {
     const { type = 'new', content, checksum, range } = response
     if (type === void 0 || content === void 0) {
-      // console.log('RECEIVE3')
-
       if (props.ready) props.ready(getLocal(hub, props))
     } else if (type === 'new') {
       if (props.store !== false) {
@@ -170,8 +168,6 @@ const defaultReceive = (hub, props, response) => {
         }
       }
 
-      // console.log('RECEIVE6')
-
       if (props.ready) props.ready(getLocal(hub, props))
     }
   }
@@ -179,6 +175,7 @@ const defaultReceive = (hub, props, response) => {
 
 const onSubscription = (hub, props) => {
   const listeners = props._onParsed
+
   const listener = p => {
     const listener = props.onChange
     close(hub, props, listener)
@@ -194,6 +191,7 @@ const onSubscription = (hub, props) => {
     // need to wait with this...
     emit(hub, listeners, getLocal(hub, nprops), nprops)
   }
+
   props._onListener = listener
   listeners.forEach(val => {
     on(hub, val, listener)

@@ -7,18 +7,41 @@ const merge = (prev, next) => {
     next !== null &&
     prev !== null
   ) {
-    for (const i in next) prev[i] = merge(prev[i], next[i])
+    for (const i in next) {
+      prev[i] = merge(prev[i], next[i])
+    }
     return prev
   }
   return next === undefined ? prev : next
 }
 
+const parseOn = config => {
+  for (let key in config) {
+    if (key === 'on') {
+      let on = config[key]
+      if (!Array.isArray(on)) {
+        config[key] = on = [on]
+      }
+      for (let i = 0; i < on.length; i++) {
+        if (typeof on[i] === 'string') {
+          const [enpoint, method] = on[i].split('.')
+          on[i] = {
+            enpoint,
+            method
+          }
+        }
+      }
+    } else if (typeof config[key] === 'object') {
+      parseOn(config[key])
+    }
+  }
+}
+
 const configure = (hub, config) => {
+  parseOn(config)
+
   if (config.url) {
-    connect(
-      hub,
-      config.url
-    )
+    connect(hub, config.url)
     delete config.url
   }
 

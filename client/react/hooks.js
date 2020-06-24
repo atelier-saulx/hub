@@ -1,7 +1,7 @@
 const React = require('react')
 const { useContext, useEffect, useState, useRef } = React
 const HubContext = React.createContext({})
-const { config } = require('../format')
+const { config, format } = require('../format')
 const { internalRpc } = require('../rpc')
 const { close } = require('../close')
 const { getLocal } = require('../getLocal')
@@ -41,6 +41,11 @@ const hookFormat = (hub, props, args, hashed) => {
   props.hash = hashed || hash(props)
   config(hub, props)
 
+  if (props.on) {
+    // can become preparsed from config
+    props._onParsed = props.on.map(val => format(hub, val))
+  }
+
   props.store = getStore(hub, props)
 
   if (props.onTimeout) {
@@ -66,10 +71,24 @@ const updateRange = (hub, subscription, id, previous) => {
   }
 }
 
+let cnt = 0
+exports.useBehaviour = (behaviour, key) => {
+  const hub = useContext(HubContext)
+  if (!key) {
+    if (!behaviour.id) {
+      behaviour.id = ++cnt
+    }
+    hub.extend(behaviour.id, behaviour)
+  } else {
+    hub.extend(key, behaviour)
+  }
+  return hub
+}
+
 const isNode = typeof window === 'undefined'
 
 // var cnt = 0
-exports.useRpc = (subscription, args, defaultValue) => {
+exports.useData = (subscription, args, defaultValue) => {
   const hub = useContext(HubContext)
   let [result, update] = useState({})
   const ref = useRef({ parsed: false, range: false, id: false })

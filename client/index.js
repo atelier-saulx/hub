@@ -15,7 +15,7 @@ const { device } = require('./device')
 const { close } = require('./close')
 const { deepNotEqual } = require('./util')
 const reset = require('./reset')
-const { useHub, useRpc, Provider } = require('./react/hooks')
+const { useHub, useData, Provider, useBehaviour } = require('./react/hooks')
 const extend = require('./extend')
 const localStorage = require('./localStorage')
 const { djb2 } = require('./hash')
@@ -103,7 +103,24 @@ class Hub {
     props = format(this, props, args)
     return getStore(this, props)
   }
-  set(props, value, immediate) {
+  set(props, value, immediate, extra) {
+    if (
+      typeof value === 'object' &&
+      immediate &&
+      immediate !== true &&
+      typeof props === 'string'
+    ) {
+      value = immediate
+      const args = immediate
+      const [endpoint, method] = props.split('.')
+      props = {
+        endpoint,
+        method,
+        args
+      }
+      immediate = extra
+    }
+
     props = format(this, props)
     return setLocal(this, props, value, immediate)
   }
@@ -131,7 +148,24 @@ class Hub {
     }
     console.log('components', components, 'hooks', set, 'fn', fn)
   }
-  merge(props, value, immediate) {
+  merge(props, value, immediate, extra) {
+    if (
+      typeof value === 'object' &&
+      immediate &&
+      immediate !== true &&
+      typeof props === 'string'
+    ) {
+      value = immediate
+      const args = immediate
+      const [endpoint, method] = props.split('.')
+      props = {
+        endpoint,
+        method,
+        args
+      }
+      immediate = extra
+    }
+
     props = format(this, props)
     return mergeLocal(this, props, value, immediate)
   }
@@ -184,7 +218,16 @@ class Hub {
 }
 
 exports.useHub = useHub
-exports.useRpc = useRpc
+
+// legacy useRpc
+exports.useRpc = (...args) => {
+  console.warn('useRpc is deprecated use useData instead')
+  return useData(...args)
+}
+
+exports.useData = useData
+exports.useBehaviour = useBehaviour
+
 exports.Provider = Provider
 exports.ProviderLegacy = ProviderLegacy
 exports.connect = connect

@@ -17,8 +17,36 @@ const config = (hub, result) => {
       }
       fields.forEach(key => {
         if (result[key] === void 0) {
-          const k = e[key]
-          result[key] = k
+          if (key === 'on') {
+            if (e.on) {
+              const on = e.on
+              let makeOwn = false
+
+              for (let i = 0; i < on.length; i++) {
+                const listener = on[i]
+                if (
+                  listener.endpoint === endpoint &&
+                  listener.method === method
+                ) {
+                  if (!makeOwn) {
+                    makeOwn = true
+                    result.on = [...on]
+                  }
+                  result.on.splice(i, 1)
+                  break
+                }
+              }
+
+              if (!makeOwn) {
+                result.on = on
+              }
+              if (result.on && result.on.length === 0) {
+                delete result.on
+              }
+            }
+          } else {
+            result[key] = e[key]
+          }
         }
       })
     }
@@ -58,7 +86,10 @@ const format = (hub, props, args, cb, hashed) => {
     if (!Array.isArray(result.on)) {
       result.on = [result.on]
     }
-    result._onParsed = result.on.map(val => format(hub, val))
+
+    if (result.on.length) {
+      result._onParsed = result.on.map(val => format(hub, val))
+    }
   }
 
   if (result.onChange) {
