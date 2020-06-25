@@ -9,6 +9,13 @@ const defaultSend = (hub, props, receive, update) => {
   if (hub.socket) {
     hub.socket.rpc(props, update)
 
+    if (props.cacheExpires) {
+      if (props.store._delete) {
+        clearTimeout(props.store._delete)
+        delete props.store._delete
+      }
+    }
+
     if (props.minLoadTime) {
       clearTimeout(props._minLoadTime)
       props._minLoadTime = setTimeout(() => {
@@ -71,12 +78,26 @@ const defaultReceive = (hub, props, response) => {
     return
   }
 
+  if (props.cacheExpires) {
+    if (props.store._delete) {
+      clearTimeout(props.store._delete)
+      delete props.store._delete
+    }
+    props.store._delete = setTimeout(() => {
+      delete props.store.v
+      delete props.store.checksum
+      delete props.store._delete
+    }, props.cacheExpires)
+  }
+
   if (response === void 0) {
     if (props.ready) props.ready(getLocal(hub, props))
   } else {
     const { type = 'new', content, checksum, range } = response
     if (type === void 0 || content === void 0) {
-      if (props.ready) props.ready(getLocal(hub, props))
+      if (props.ready) {
+        props.ready(getLocal(hub, props))
+      }
     } else if (type === 'new') {
       if (props.store !== false) {
         if (response.error) {
@@ -87,7 +108,9 @@ const defaultReceive = (hub, props, response) => {
         }
       }
 
-      if (props.ready) props.ready(content)
+      if (props.ready) {
+        props.ready(content)
+      }
     } else if (type === 'update') {
       if (props.store !== false) {
         if (response.error) {
@@ -181,7 +204,9 @@ const onSubscription = (hub, props) => {
     close(hub, props, listener)
     props.listening = false
     props.hash = false
+
     props.store = false
+
     if (props.call) {
       props.args = props._prevArgs
     }
@@ -201,6 +226,7 @@ const onSubscription = (hub, props) => {
 const internalRpc = (hub, props, update) => {
   if (!props.receive) props.receive = defaultReceive
   if (props.send === void 0) props.send = defaultSend
+
   const listener = props.onChange
   if (!props.listening && listener) {
     if (props.on) {
@@ -214,6 +240,10 @@ const internalRpc = (hub, props, update) => {
       on(hub, props, listener)
     }
     props.listening = true
+  }
+
+  if (props.store && props.store._delete) {
+    clearTimeout(props.store._delete)
   }
 
   if (props.send) {
