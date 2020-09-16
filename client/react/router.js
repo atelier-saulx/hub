@@ -103,14 +103,15 @@ class Route extends React.Component {
 
     const matched = parsed[path].re.exec(data)
     let match
+    console.log('????????')
     if (matched) {
       const hasQuery = /\?.{1,500}$/.test(data)
+      console.log('------------', data, matched)
       const q = hasQuery && data.split('?')[1]
       match = {
         params: parsed[path].keys.reduce((params, { name }, index) => {
-          params[name] = hasQuery
-            ? matched[index + 1].split('?')[0]
-            : matched[index + 1]
+          const val = matched[index + 1]
+          if (val) params[name] = hasQuery ? val.split('?')[0] : val
           return params
         }, {})
       }
@@ -146,7 +147,4 @@ exports.Link = connect(Link)
 
 exports.Switch = Switch
 
-exports.Route = connect(
-  Route,
-  'device.history'
-)
+exports.Route = connect(Route, 'device.history')
