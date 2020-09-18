@@ -103,10 +103,8 @@ class Route extends React.Component {
 
     const matched = parsed[path].re.exec(data)
     let match
-    console.log('????????')
     if (matched) {
       const hasQuery = /\?.{1,500}$/.test(data)
-      console.log('------------', data, matched)
       const q = hasQuery && data.split('?')[1]
       match = {
         params: parsed[path].keys.reduce((params, { name }, index) => {
