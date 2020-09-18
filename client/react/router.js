@@ -73,7 +73,6 @@ class Route extends React.Component {
       asyncComponent,
       hub
     } = this.props
-
     let path = hub.path + inputPath
     if (inputPath === '/' && hub.path) {
       path = hub.path
@@ -129,6 +128,7 @@ class Route extends React.Component {
         return React.createElement(component, { hub, match })
       }
     }
+
     return null
   }
 }
