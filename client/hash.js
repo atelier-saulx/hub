@@ -7,20 +7,19 @@ const djb2 = (str, hash = 5381) => {
 }
 
 const argHasher = (obj, hash = 5381) => {
-  let keyId = 0
   for (let key in obj) {
     const field = obj[key]
     const type = typeof field
     if (type === 'string') {
-      hash = (djb2(field, hash) * 33) ^ ++keyId
+      hash = (djb2(field, hash) * 33) ^ djb2(key, hash)
     } else if (type === 'number') {
-      hash = (((hash * 33) ^ field) * 33) ^ ++keyId
+      hash = (((hash * 33) ^ field) * 33) ^ djb2(key, hash)
     } else if (type === 'object') {
       if (field) {
         hash = argHasher(field, hash)
       }
     } else if (type === 'boolean') {
-      hash = (((hash * 33) ^ (field === true ? 1 : 0)) * 33) ^ ++keyId
+      hash = (((hash * 33) ^ (field === true ? 1 : 0)) * 33) ^ djb2(key, hash)
     }
   }
   return hash
