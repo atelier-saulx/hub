@@ -363,7 +363,6 @@ class Socket extends Emitter {
       this.sendQueue()
       return
     }
-
     if (isSubscriber) {
       if (!sub) {
         this.subscriptions[hash] = {
@@ -391,7 +390,6 @@ class Socket extends Emitter {
         return
       }
     }
-
     const payload = this.createPayload(props)
     payload.seq = ++this.seq
     this.callbacks[this.seq] = { props }

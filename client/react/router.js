@@ -73,7 +73,6 @@ class Route extends React.Component {
       asyncComponent,
       hub
     } = this.props
-
     let path = hub.path + inputPath
     if (inputPath === '/' && hub.path) {
       path = hub.path
@@ -108,9 +107,8 @@ class Route extends React.Component {
       const q = hasQuery && data.split('?')[1]
       match = {
         params: parsed[path].keys.reduce((params, { name }, index) => {
-          params[name] = hasQuery
-            ? matched[index + 1].split('?')[0]
-            : matched[index + 1]
+          const val = matched[index + 1]
+          if (val) params[name] = hasQuery ? val.split('?')[0] : val
           return params
         }, {})
       }
@@ -118,6 +116,7 @@ class Route extends React.Component {
     }
 
     if (match) {
+      hub.match = match
       if (switchState) {
         switchState.selected = path
       }
@@ -130,6 +129,7 @@ class Route extends React.Component {
         return React.createElement(component, { hub, match })
       }
     }
+
     return null
   }
 }
@@ -146,7 +146,4 @@ exports.Link = connect(Link)
 
 exports.Switch = Switch
 
-exports.Route = connect(
-  Route,
-  'device.history'
-)
+exports.Route = connect(Route, 'device.history')

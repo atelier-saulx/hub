@@ -1,7 +1,7 @@
 {
   "name": "@saulx/hub",
   "description": "Front end state management",
-  "version": "3.1.0",
+  "version": "3.1.2",
   "scripts": {
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
-    "saulx-murmur": "0.0.4",
+    "saulx-murmur": "0.1.0",
     "path-to-regexp": "^6.1.0",
     "resolve-from": "^5.0.0",
     "prop-types": "^15.6.1",
