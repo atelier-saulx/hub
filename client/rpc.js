@@ -112,10 +112,15 @@ const defaultReceive = (hub, props, response) => {
         props.ready(content)
       }
     } else if (type === 'update') {
+      // add an extra thing 'patch'
+
       if (props.store !== false) {
         if (response.error) {
           setLocal(hub, props, void 0)
         } else {
+          // if response.patch
+          // then apply patch
+
           if (checksum) props.store.checksum = checksum
           mergeLocal(hub, props, content)
         }
