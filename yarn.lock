@@ -818,6 +818,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@clusterws/cws@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@clusterws/cws/-/cws-3.0.0.tgz#518fc8e7d9066e220f6f6aef3158cc14d5a1e98e"
+  integrity sha512-6RO7IUbSlTO3l8XPN/9g21YGPF4HjfkidDzchkP0h6iwq5jYtji+KUCgyxcSYiuN7aWu8nGJDjBer7XJilPnOg==
+
 "@concordance/react@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@concordance/react/-/react-2.0.0.tgz#aef913f27474c53731f4fd79cc2f54897de90fde"
