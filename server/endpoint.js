@@ -1,4 +1,6 @@
 const murmur = require('saulx-murmur').murmurHash
+const { createPatch } = require('@saulx/selva-diff')
+const { hashObject } = require('@saulx/utils')
 
 const sliceRange = (data, msg, force) => {
   const receivedRange = msg.receivedRange
@@ -63,15 +65,39 @@ class Endpoint {
     })
   }
   // data is non-stringified
-  setData(data, checksum) {
+  setData(data, checksum, makeDiff, cacheStringify) {
+    const prev = this.data
+    let str
     if (typeof data === 'object') {
       this.data = data
-    }
-    if (checksum === void 0) {
-      checksum = this.generateChecksum(JSON.stringify(data))
+      if (checksum === void 0) {
+        checksum = hashObject(data)
+      }
+    } else {
+      if (checksum === void 0) {
+        str = JSON.stringify(data)
+        checksum = this.generateChecksum()
+      }
     }
     const changed = checksum !== this.checksum
+
+    const prevChecksum = this.checksum
+
     this.checksum = checksum
+
+    if (prev && makeDiff && changed && prevChecksum) {
+      const patch = createPatch(prev, data)
+
+      this.setDiff({
+        data: patch,
+        from: [prevChecksum, checksum]
+      })
+    }
+
+    if (cacheStringify && changed) {
+      this.content = str || JSON.stringify(data)
+    }
+
     return changed
   }
   setDiff(data) {
@@ -83,7 +109,9 @@ class Endpoint {
   // content is allways pre-stringified
   setContent(data, checksum) {
     if (typeof data === 'object') {
-      this.content = JSON.stringify(data)
+      if (checksum === void 0 || (checksum && checksum !== this.checksum)) {
+        this.content = JSON.stringify(data)
+      }
     } else {
       this.content = data
     }
@@ -177,7 +205,6 @@ class Endpoint {
             // eslint-disable-next-line
             endpoint.diff.from[1] == checksum
           ) {
-            // console.log(endpoint.diff.from, checksum, msg.checksum)
             content = endpoint.diff.content
             type = 'update'
           }

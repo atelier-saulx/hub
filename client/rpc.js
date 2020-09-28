@@ -1,4 +1,4 @@
-const { setLocal, mergeLocal } = require('./setLocal')
+const { setLocal, applyPatch } = require('./setLocal')
 const { emit } = require('./emit')
 const { close } = require('./close')
 const { format } = require('./format')
@@ -112,20 +112,21 @@ const defaultReceive = (hub, props, response) => {
         props.ready(content)
       }
     } else if (type === 'update') {
-      // add an extra thing 'patch'
-
-      if (props.store !== false) {
-        if (response.error) {
-          setLocal(hub, props, void 0)
-        } else {
-          // if response.patch
-          // then apply patch
-
-          if (checksum) props.store.checksum = checksum
-          mergeLocal(hub, props, content)
+      if (checksum && props.store.checksum) {
+        if (props.store !== false) {
+          if (response.error) {
+            setLocal(hub, props, void 0)
+          } else {
+            props.store.checksum = checksum
+            applyPatch(hub, props, content)
+          }
         }
+      } else {
+        console.error(
+          'Trying to send a patch to something we cant update',
+          content
+        )
       }
-
       if (props.ready) props.ready(getLocal(hub, props))
     } else if (type === 'range') {
       if (props.store !== false) {

@@ -1,4 +1,5 @@
 const { emit, emitImmediate } = require('./emit')
+const { applyPatch: applyDiffPatch } = require('@saulx/selva-diff')
 const { deepNotEqual, mergeObj } = require('./util')
 
 const emitChange = (hub, listeners, value, props, prev, immediate) => {
@@ -45,6 +46,26 @@ const setLocal = (hub, props, value, immediate) => {
   return props
 }
 
+const applyPatch = (hub, props, patch, immediate) => {
+  const store = props.store
+  const listeners = store.listeners
+  const prev = store.v === void 0 ? props.default : store.v
+
+  const v = applyDiffPatch(prev, patch)
+
+  if (listeners) {
+    store.v = v
+    if (immediate) {
+      emitImmediate(hub, listeners, v, props, prev)
+    } else {
+      emit(hub, listeners, v, props, prev)
+    }
+  } else {
+    store.v = v
+  }
+  return props
+}
+
 const mergeLocal = (hub, props, value, immediate) => {
   if (props.transform) {
     value = props.transform(hub, value)
@@ -83,3 +104,4 @@ const removeLocal = (hub, props, value, immediate) => {
 exports.removeLocal = removeLocal
 exports.setLocal = setLocal
 exports.mergeLocal = mergeLocal
+exports.applyPatch = applyPatch
