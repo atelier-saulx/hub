@@ -116,6 +116,7 @@ class Route extends React.Component {
     }
 
     if (match) {
+      console.log('match!', match)
       hub.match = match
       if (switchState) {
         switchState.selected = path
