@@ -141,7 +141,7 @@ class Endpoint {
   onEmpty(fn = this.remove, time = 2e3) {
     this.on('close', () => this.deferRemove(fn, time))
   }
-  send(endpoint, client, msg) {
+  send(endpoint, client, msg, forceResend) {
     if (endpoint.debug) {
       console.log(
         '\n $INCOMING',
@@ -195,10 +195,10 @@ class Endpoint {
     } else {
       const checksum = endpoint.checksum
       // eslint-disable-next-line
-      if (checksum != msg.checksum) {
+      if (checksum != msg.checksum || forceResend) {
         let content = endpoint.content || endpoint.data
         let type = 'new'
-        if (endpoint.diff && msg.checksum) {
+        if (endpoint.diff && msg.checksum && !forceResend) {
           if (
             // eslint-disable-next-line
             endpoint.diff.from[0] == msg.checksum &&
@@ -226,6 +226,8 @@ class Endpoint {
           )
         }
       } else if (msg.noSubscription || msg.needConfirmation) {
+        console.log('CHECKSUM IS THE SAME')
+
         client.sendChannel({}, msg, endpoint)
       }
     }

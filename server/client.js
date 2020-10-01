@@ -143,6 +143,7 @@ class Client {
   }
   subscribe(endpoint, msg, dontSend) {
     let dontSubscribe
+
     if (!msg.channel) {
       if (msg.noSubscription) {
         dontSubscribe = true
@@ -182,7 +183,7 @@ class Client {
             subs.range = msg.range
             subs.receivedRange = msg.receivedRange
             if (!dontSend && (endpoint.content || endpoint.data)) {
-              endpoint.send(endpoint, this, subs)
+              endpoint.send(endpoint, this, subs, msg.requestNew)
             }
           }
         }

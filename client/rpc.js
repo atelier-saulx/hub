@@ -112,22 +112,34 @@ const defaultReceive = (hub, props, response) => {
         props.ready(content)
       }
     } else if (type === 'update') {
+      console.log('hello', content)
+      let resend
       if (checksum && props.store.checksum) {
         if (props.store !== false) {
           if (response.error) {
             setLocal(hub, props, void 0)
           } else {
             props.store.checksum = checksum
-            applyPatch(hub, props, content)
+            if (applyPatch(hub, props, content) === null) {
+              resend = true
+            }
           }
         }
       } else {
-        console.error(
-          'Trying to send a patch to something we cant update',
-          content
+        resend = true
+        console.warn(
+          'Mismatching checksums from received diff',
+          checksum,
+          props.store.checksum
         )
+        // send request for all
       }
-      if (props.ready) props.ready(getLocal(hub, props))
+
+      if (resend) {
+        hub.socket.rpc(props, true, true)
+      } else {
+        if (props.ready) props.ready(getLocal(hub, props))
+      }
     } else if (type === 'range') {
       if (props.store !== false) {
         if (response.error) {

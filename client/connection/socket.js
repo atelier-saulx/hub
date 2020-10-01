@@ -91,6 +91,8 @@ const sendSubscription = (socket, force, isReconnect) => {
       const payload = socket.createPayload(props)
       payload.seq = ++socket.seq
 
+      console.log('what are you sending?')
+
       if (force && channel !== void 0) {
         payload.channel = channel
         socket.resolved[channel] = socket.seq
@@ -297,7 +299,7 @@ class Socket extends Emitter {
       }
     }
   }
-  createPayload(props) {
+  createPayload(props, requestNew) {
     const isSubscriber = props.isSubscriber
     const payload = {
       endpoint: props.endpoint,
@@ -318,19 +320,28 @@ class Socket extends Emitter {
     if (!isSubscriber || props.multiplex) {
       payload.noSubscription = true
     }
+
+    if (isSubscriber) {
+      payload.diff = true
+    }
+
+    if (requestNew) {
+      payload.requestNew = true
+    }
+
     if (props.store.checksum) {
       payload.checksum = props.store.checksum
     }
     props.isSent = true
     return payload
   }
-  rpc(props, update) {
+  rpc(props, update, requestNew) {
     const isSubscriber = props.isSubscriber || props.multiplex
     const hash = props.hash
     const sub = this.subscriptions[hash]
 
     if (update && props.isSent && sub) {
-      const payload = this.createPayload(props)
+      const payload = this.createPayload(props, requestNew)
       const inQueue = props.store.inQueue
       if (inQueue !== void 0) {
         if (

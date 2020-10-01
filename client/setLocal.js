@@ -49,10 +49,11 @@ const setLocal = (hub, props, value, immediate) => {
 const applyPatch = (hub, props, patch, immediate) => {
   const store = props.store
   const listeners = store.listeners
-  const prev = store.v === void 0 ? props.default : store.v
-
+  const prev = store.v
   const v = applyDiffPatch(prev, patch)
-
+  if (v === null) {
+    return null
+  }
   if (listeners) {
     store.v = v
     if (immediate) {
