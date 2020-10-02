@@ -68,8 +68,8 @@
     "deep-object-diff": "^1.1.0"
   },
   "dependencies": {
-    "@saulx/selva-diff": "^1.0.9",
-    "@saulx/utils": "^1.0.3",
+    "@saulx/selva-diff": "^1.0.10",
+    "@saulx/utils": "^1.0.5",
     "chalk": "^2.4.2",
     "saulx-murmur": "0.1.0",
     "path-to-regexp": "^6.1.0",
