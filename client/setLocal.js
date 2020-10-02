@@ -1,6 +1,8 @@
 const { emit, emitImmediate } = require('./emit')
-const { applyPatch: applyDiffPatch } = require('@saulx/selva-diff')
+const diff = require('@saulx/selva-diff')
 const { deepNotEqual, mergeObj } = require('./util')
+
+const applyDiffPatch = diff.applyPatch
 
 const emitChange = (hub, listeners, value, props, prev, immediate) => {
   if (typeof value !== typeof prev) {
