@@ -1046,17 +1046,17 @@
     vigour-ua latest
     ws "^5.2.0"
 
-"@saulx/selva-diff@^1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@saulx/selva-diff/-/selva-diff-1.0.7.tgz#0289a23c8bf3ed1c269ae01a2056b2b789da533a"
-  integrity sha512-RHtF/yviW20k/ZuZ5SIBFYuySS/lHmW6tZRLQJqNSpwZT4klKTciocTZk0We1XDmXFkjIWT4eatj9TNgUrW8Vw==
+"@saulx/selva-diff@^1.0.10":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@saulx/selva-diff/-/selva-diff-1.0.11.tgz#032317cefb17fba43d29230003c32155fabff82a"
+  integrity sha512-8843olW0/533Yf5zAHS8zD28lG9gPuBvBmFe+ybFqTo3ZDr00783v4EPhX4BXvOFRG9ydAGCrAxLVdNxOILzPw==
   dependencies:
-    "@saulx/utils" "^1.0.4"
+    "@saulx/utils" "^1.0.6"
 
-"@saulx/utils@^1.0.3", "@saulx/utils@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@saulx/utils/-/utils-1.0.4.tgz#4d9ad6c5cbbd134426dec0a64286c7a2e5b12ddf"
-  integrity sha512-E0ZLQcQG8vKuudz0v3F2YDSy0jWB2i/Ovd7xFCLConsuBdrL+crz2XzWBb7slJDjsZWMJX6MfmeWmHlDOve9NA==
+"@saulx/utils@^1.0.6":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@saulx/utils/-/utils-1.0.8.tgz#9a10575ab4d018f6685f5e04bc81119703850f82"
+  integrity sha512-AWBcGdFLnL9sLoRlVvdbsrlUIhdnzenFSqhP3lFPD6wzv1qj7ZNf3JtP2/OS4hFU0zAqzSP3bdaS2qhYKWO7BA==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
