@@ -8,6 +8,7 @@ const createServer = (
   endpoints,
   ua,
   onConnection,
+  authorize,
   key,
   cert,
   debug,
@@ -57,6 +58,7 @@ const createServer = (
           try {
             let url = req.getUrl()
             let q = req.getQuery()
+
             let cUa = ua ? req.getHeader('user-agent') : ''
             res.onAborted(() => {
               res.aborted = true
@@ -113,82 +115,84 @@ const createServer = (
         }
       }
 
+      const message = (socket, message) => {
+        let messages
+        try {
+          const decoded = enc.decode(message)
+          if (debug) {
+            console.log('INCOMING', socket._debugId, decoded)
+          }
+          if (decoded === '1') {
+            if (debug) {
+              console.log('PING FROM CLIENT', socket._debugId)
+            }
+          } else {
+            try {
+              messages = JSON.parse(decoded)
+            } catch (err) {
+              if (debug) {
+                console.log('ERROR PARSING JSON', socket._debugId, err)
+              }
+            }
+          }
+        } catch (err) {
+          if (debug) {
+            console.log('ERROR DECODING INCOMING', socket._debugId, err)
+          }
+        }
+        if (messages && Array.isArray(messages)) {
+          messages.forEach(msg => {
+            if (typeof msg === 'object') {
+              if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
+                socket.client.close(msg.channel, msg.seq)
+              } else {
+                router(socket.client, msg)
+              }
+            }
+          })
+        }
+      }
+
+      const open = (socket, req) => {
+        const client = new Client(socket)
+        socket.client = client
+        if (ua) {
+          client.ua = req.getHeader('user-agent')
+        }
+        if (onConnection) {
+          onConnection(true, client)
+        }
+      }
+
+      const close = socket => {
+        if (socket.client) {
+          socket.client.socket = null
+          socket.client.closed = true
+          socket.client.closeAll()
+          if (onConnection) {
+            onConnection(false, socket.client)
+          }
+          socket.client.socket = null
+          socket.client = null
+        }
+      }
+
       app
         .ws('/*', {
           maxPayloadLength: 1024 * 1024 * 5, // 5mb should be more then enough
           idleTimeout: 100,
           compression: 1,
-          message: (socket, message) => {
-            let messages
-            try {
-              const decoded = enc.decode(message)
-              if (debug) {
-                console.log('INCOMING', socket._debugId, decoded)
-              }
-              if (decoded === '1') {
-                if (debug) {
-                  console.log('PING FROM CLIENT', socket._debugId)
-                }
-              } else {
-                try {
-                  messages = JSON.parse(decoded)
-                } catch (err) {
-                  if (debug) {
-                    console.log('ERROR PARSING JSON', socket._debugId, err)
-                  }
+          message,
+          open: authorize
+            ? async (socket, req) => {
+                if (await authorize(socket, req)) {
+                  return open(socket, req)
+                } else {
+                  socket.close()
                 }
               }
-            } catch (err) {
-              if (debug) {
-                console.log('ERROR DECODING INCOMING', socket._debugId, err)
-              }
-            }
-            if (messages && Array.isArray(messages)) {
-              messages.forEach(msg => {
-                if (typeof msg === 'object') {
-                  if (
-                    msg.endpoint === 'channel' &&
-                    msg.method === 'unsubscribe'
-                  ) {
-                    socket.client.close(msg.channel, msg.seq)
-                  } else {
-                    router(socket.client, msg)
-                  }
-                }
-              })
-            }
-          },
-          open: (socket, req) => {
-            if (debug) {
-              socket._debugId = Math.floor(Math.random() * 9999999).toString(16)
-              console.log('CONNECT CLIENT', socket._debugId)
-            }
-            const client = new Client(socket)
-            socket.client = client
-            if (ua) {
-              client.ua = req.getHeader('user-agent')
-              // const ip = req.getHeader('x-forwarded-for')
-              // if (ip) {
-              // client.ipv6 = ip
-              // }
-            }
-            if (onConnection) {
-              onConnection(true, client)
-            }
-          },
-          close: (socket, code, message) => {
-            if (debug) {
-              console.log('--------> REMOVE CLIENT', socket._debugId)
-            }
-            socket.client.socket = null
-            socket.client.closed = true
-            socket.client.closeAll()
-            if (onConnection) {
-              onConnection(false, socket.client)
-            }
-            socket.client.socket = null
-            socket.client = null
-          }
+            : open,
+          close
         })
         .any('/*', restHandler)
         .listen(port, listenSocket => {

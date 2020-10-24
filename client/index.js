@@ -36,7 +36,9 @@ class Hub {
       ) >>> 0
     ).toString(16)
     device(this, config)
-    if (config) configure(this, config)
+    if (config) {
+      configure(this, config)
+    }
   }
   is(props, args, check) {
     return new Promise((resolve, reject) => {

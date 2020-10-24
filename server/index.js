@@ -27,9 +27,7 @@ const createEndpoints = p => {
       })
   } catch (err) {
     console.error(
-      `\n\n\n🔥 Problem with endpoints "${err.message}" ${last.endpoint}/${
-        last.method
-      } 🔥 \n\n\n`
+      `\n\n\n🔥 Problem with endpoints "${err.message}" ${last.endpoint}/${last.method} 🔥 \n\n\n`
     )
   }
   return endpoints
@@ -40,6 +38,7 @@ exports.createServer = function({
   ua,
   endpoints = '',
   onConnection,
+  authorize,
   key,
   json,
   cert,
@@ -101,6 +100,7 @@ exports.createServer = function({
       endpoints,
       ua,
       onConnection,
+      authorize,
       key,
       cert,
       debug,
