@@ -117,6 +117,9 @@ const createServer = (
 
       const message = (socket, message) => {
         let messages
+        if (!socket.client) {
+          socket.close()
+        }
         try {
           const decoded = enc.decode(message)
           if (debug) {
