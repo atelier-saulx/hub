@@ -163,6 +163,8 @@ const createServer = (
         if (ua) {
           client.ua = req.getHeader('user-agent')
         }
+
+        socket.send('200')
         if (onConnection) {
           onConnection(true, client)
         }
