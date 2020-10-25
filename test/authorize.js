@@ -7,7 +7,7 @@ test('authorize', async t => {
   createServer({
     port: 9191,
     authorize: async () => {
-      await wait(1e3)
+      await wait(3e3)
       console.log('in coming connection - authorized')
       return true
     },
