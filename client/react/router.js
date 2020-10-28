@@ -7,7 +7,7 @@ const { pathToRegexp } = require('path-to-regexp')
 
 class Link extends React.Component {
   render() {
-    const { children, to, hub, style, className } = this.props
+    const { children, to, hub } = this.props
     return React.createElement(
       'a',
       {
@@ -17,8 +17,7 @@ class Link extends React.Component {
           e.stopPropagation()
           e.preventDefault()
         },
-        style,
-        className
+        ...this.props
       },
       children
     )

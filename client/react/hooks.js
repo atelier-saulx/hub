@@ -94,6 +94,7 @@ exports.useData = (subscription, args, defaultValue) => {
   const ref = useRef({ parsed: false, range: false, id: false })
   const previous = ref.current
   let parsed, id, hashed, changedRange
+
   if (subscription) {
     const isString = typeof subscription === 'string'
     if (!isString && args && !defaultValue) {
@@ -168,5 +169,6 @@ exports.useData = (subscription, args, defaultValue) => {
       }
     }, [id])
   }
+
   return result === void 0 || result.v === void 0 ? defaultValue : result.v
 }
