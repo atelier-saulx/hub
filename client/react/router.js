@@ -13,7 +13,6 @@ class Link extends React.Component {
       {
         href: hub.path + to,
         onClick: e => {
-          console.log({ replaceState })
           if (replaceState) window.history.replaceState(null, '', to)
           hub.set('device.history', to)
           e.stopPropagation()
