@@ -147,7 +147,12 @@ const createServer = (
         if (messages && Array.isArray(messages)) {
           messages.forEach(msg => {
             if (typeof msg === 'object') {
-              if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
+              if (msg.endpoint === 'browserClient' && msg.method === 'open') {
+                socket.client.ua = msg.args.ua
+              } else if (
+                msg.endpoint === 'channel' &&
+                msg.method === 'unsubscribe'
+              ) {
                 socket.client.close(msg.channel, msg.seq)
               } else {
                 router(socket.client, msg)
@@ -157,14 +162,9 @@ const createServer = (
         }
       }
 
-      const open = (socket, req) => {
+      const open = socket => {
         const client = new Client(socket)
         socket.client = client
-        if (ua) {
-          client.ua = req.getHeader('user-agent')
-        }
-
-        socket.send('200')
         if (onConnection) {
           onConnection(true, client)
         }
@@ -189,16 +189,53 @@ const createServer = (
           idleTimeout: 100,
           compression: 1,
           message,
-          open: authorize
-            ? async (socket, req) => {
-                if (await authorize(socket, req)) {
-                  return open(socket, req)
-                } else {
-                  socket.close()
+          open,
+          close,
+          upgrade: (res, req, ctx) => {
+            const url = req.getUrl()
+            const secWebSocketKey = req.getHeader('sec-websocket-key')
+            const secWebSocketProtocol = req.getHeader('sec-websocket-protocol')
+            const secWebSocketExtensions = req.getHeader(
+              'sec-websocket-extensions'
+            )
+
+            let aborted = false
+            let authorized = false
+
+            res.onAborted(() => {
+              aborted = true
+            })
+
+            const fn = authorize || (() => Promise.resolve(true))
+
+            fn(req, ctx)
+              .then(authResult => {
+                authorized = authResult
+              })
+              .catch(e => {
+                console.error(e)
+              })
+              .finally(() => {
+                if (aborted) {
+                  return
                 }
-              }
-            : open,
-          close
+
+                if (authorized) {
+                  res.upgrade(
+                    {
+                      url
+                    },
+                    secWebSocketKey,
+                    secWebSocketProtocol,
+                    secWebSocketExtensions,
+                    ctx
+                  )
+                } else {
+                  res.writeStatus('401 Unauthorized')
+                  res.end()
+                }
+              })
+          }
         })
         .any('/*', restHandler)
         .listen(port, listenSocket => {

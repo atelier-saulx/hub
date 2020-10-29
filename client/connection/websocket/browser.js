@@ -38,15 +38,28 @@ const connect = (holder, socket, url, time = 0, reconnect = false) => {
         if (reconnect && socket.listeners.reconnect) {
           socket.listeners.reconnect.forEach(fn => fn())
         }
-        if (socket.listeners.open) socket.listeners.open.forEach(fn => fn())
+        if (socket.listeners.open) {
+          socket.listeners.open.forEach(fn => fn())
+        }
         socket.connected = true
+        ws.send(
+          JSON.stringify({
+            endpoint: 'browserClient',
+            method: 'open',
+            args: {
+              ua: window.navigator.userAgent
+            }
+          })
+        )
       }
       ws.onclose = () => {
         socket.connected = false
         if (holder.closed) {
           return
         }
-        if (socket.listeners.close) socket.listeners.close.forEach(fn => fn())
+        if (socket.listeners.close) {
+          socket.listeners.close.forEach(fn => fn())
+        }
         connect(
           holder,
           socket,

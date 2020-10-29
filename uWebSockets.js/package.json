@@ -1,5 +1,6 @@
 {
-  "main": "uws.js",
   "name": "uWebSockets.js",
-  "version": "0.0.1"
+  "version": "18.8.0",
+  "main": "uws.js",
+  "types": "./index.d.ts"
 }

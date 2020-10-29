@@ -112,36 +112,25 @@ const sendSubscription = (socket, force, isReconnect) => {
 const listen = socket => {
   socket.on('close', data => close(socket))
 
-  const onReady = () => {
+  socket.on('open', data => {
     if (socket.closed) {
       socket.closed = false
       sendSubscription(socket, false, true)
     } else {
       sendSubscription(socket)
     }
-  }
-
-  // socket.on('open', data => {
-  //   if (socket.ready) {
-  //     onReady()
-  //   }
-  // })
+  })
 
   socket.on('data', data => {
-    if (data === 200) {
-      socket.ready = true
-      onReady()
-    } else {
-      if (socket.hub.globalSettings && socket.hub.globalSettings.incoming) {
-        const parsed = socket.hub.globalSettings.incoming(socket.hub, data)
-        if (parsed) {
-          handleIncoming(socket, parsed)
-        }
-      } else {
-        handleIncoming(socket, data)
+    if (socket.hub.globalSettings && socket.hub.globalSettings.incoming) {
+      const parsed = socket.hub.globalSettings.incoming(socket.hub, data)
+      if (parsed) {
+        handleIncoming(socket, parsed)
       }
-      socket.idleTimeout()
+    } else {
+      handleIncoming(socket, data)
     }
+    socket.idleTimeout()
   })
 }
 
@@ -176,7 +165,6 @@ class Socket extends Emitter {
     this.hub = hub
     this.resolved = {}
     this.channels = {}
-    this.ready = false
     listen(this)
     this.connection = connectWs({}, this, url)
   }
@@ -212,7 +200,7 @@ class Socket extends Emitter {
     }
   }
   sendQueue() {
-    if (!this.inprogress && this.ready) {
+    if (!this.inprogress) {
       this.inprogress = setTimeout(() => {
         if (this.connection && this.connected && this.queue.length) {
           if (this.hub.globalSettings && this.hub.globalSettings.send) {
