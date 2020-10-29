@@ -148,7 +148,6 @@ const createServer = (
           messages.forEach(msg => {
             if (typeof msg === 'object') {
               if (msg.endpoint === 'browserClient' && msg.method === 'open') {
-                console.log('poopypoop')
                 socket.client.ua = msg.args.ua
               } else if (
                 msg.endpoint === 'channel' &&
