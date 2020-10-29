@@ -7,17 +7,19 @@ const { pathToRegexp } = require('path-to-regexp')
 
 class Link extends React.Component {
   render() {
-    const { children, to, hub } = this.props
+    const { children, to, hub, replaceState, ...props } = this.props
     return React.createElement(
       'a',
       {
         href: hub.path + to,
         onClick: e => {
+          console.log({ replaceState })
+          if (replaceState) window.history.replaceState(null, '', to)
           hub.set('device.history', to)
           e.stopPropagation()
           e.preventDefault()
         },
-        ...this.props
+        ...props
       },
       children
     )
