@@ -147,7 +147,13 @@ const createServer = (
         if (messages && Array.isArray(messages)) {
           messages.forEach(msg => {
             if (typeof msg === 'object') {
-              if (msg.endpoint === 'channel' && msg.method === 'unsubscribe') {
+              if (msg.endpoint === 'browserClient' && msg.method === 'open') {
+                console.log('poopypoop')
+                socket.client.ua = msg.args.ua
+              } else if (
+                msg.endpoint === 'channel' &&
+                msg.method === 'unsubscribe'
+              ) {
                 socket.client.close(msg.channel, msg.seq)
               } else {
                 router(socket.client, msg)
@@ -157,14 +163,9 @@ const createServer = (
         }
       }
 
-      const open = (socket, req) => {
+      const open = socket => {
         const client = new Client(socket)
         socket.client = client
-        // if (ua) {
-        //   client.ua = req.getHeader('user-agent')
-        // }
-
-        socket.send('200')
         if (onConnection) {
           onConnection(true, client)
         }
@@ -221,7 +222,6 @@ const createServer = (
                 }
 
                 if (authorized) {
-                  console.log('yes authorized')
                   res.upgrade(
                     {
                       url
