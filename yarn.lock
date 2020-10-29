@@ -1058,6 +1058,11 @@
   resolved "https://registry.yarnpkg.com/@saulx/utils/-/utils-1.0.8.tgz#9a10575ab4d018f6685f5e04bc81119703850f82"
   integrity sha512-AWBcGdFLnL9sLoRlVvdbsrlUIhdnzenFSqhP3lFPD6wzv1qj7ZNf3JtP2/OS4hFU0zAqzSP3bdaS2qhYKWO7BA==
 
+"@saulx/utils@^1.1.1":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@saulx/utils/-/utils-1.3.0.tgz#ecc8ab187e90ca1b78c26def7a142dcb5a4c7233"
+  integrity sha512-RQJO5jVAm5+hiVqpHj7eCmbe5XzW3EReUyBFMLplOOmxw9tDRCz/GkQRtfJLjjPmspmS9iTSk5z4GiYRuMjP2A==
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
