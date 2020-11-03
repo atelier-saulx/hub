@@ -171,7 +171,6 @@ class Socket extends Emitter {
   disconnect() {
     this.connection.closed = true
     if (this.connection.ws) {
-      console.log('DISCONNECT')
       this.connection.ws.close()
     }
   }
@@ -182,7 +181,6 @@ class Socket extends Emitter {
         this.connection.ws.close()
       }
       this.url = url
-      console.log('RECONNECT')
       this.connection = connectWs({}, this, url)
     }
   }
