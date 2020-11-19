@@ -144,21 +144,21 @@ const createServer = (
             console.log('ERROR DECODING INCOMING', socket._debugId, err)
           }
         }
-        if (messages && Array.isArray(messages)) {
-          messages.forEach(msg => {
-            if (typeof msg === 'object') {
-              if (msg.endpoint === 'browserClient' && msg.method === 'open') {
-                socket.client.ua = msg.args.ua
-              } else if (
-                msg.endpoint === 'channel' &&
-                msg.method === 'unsubscribe'
-              ) {
-                socket.client.close(msg.channel, msg.seq)
-              } else {
-                router(socket.client, msg)
+        if (messages) {
+          if (Array.isArray(messages)) {
+            messages.forEach(msg => {
+              if (typeof msg === 'object') {
+                if (
+                  msg.endpoint === 'channel' &&
+                  msg.method === 'unsubscribe'
+                ) {
+                  socket.client.close(msg.channel, msg.seq)
+                } else {
+                  router(socket.client, msg)
+                }
               }
-            }
-          })
+            })
+          }
         }
       }
 
@@ -193,6 +193,7 @@ const createServer = (
           close,
           upgrade: (res, req, ctx) => {
             const url = req.getUrl()
+            const ua = req.getHeader('user-agent')
             const secWebSocketKey = req.getHeader('sec-websocket-key')
             const secWebSocketProtocol = req.getHeader('sec-websocket-protocol')
             const secWebSocketExtensions = req.getHeader(
@@ -223,7 +224,8 @@ const createServer = (
                 if (authorized) {
                   res.upgrade(
                     {
-                      url
+                      url,
+                      ua
                     },
                     secWebSocketKey,
                     secWebSocketProtocol,

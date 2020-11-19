@@ -42,15 +42,6 @@ const connect = (holder, socket, url, time = 0, reconnect = false) => {
           socket.listeners.open.forEach(fn => fn())
         }
         socket.connected = true
-        ws.send(
-          JSON.stringify({
-            endpoint: 'browserClient',
-            method: 'open',
-            args: {
-              ua: window.navigator.userAgent
-            }
-          })
-        )
       }
       ws.onclose = () => {
         socket.connected = false
