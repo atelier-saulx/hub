@@ -39,39 +39,19 @@ class Client {
       this.socket.send(JSON.stringify(payload))
     }
   }
+
   send(payload, msg) {
     payload.seq = msg.seq
     this.sendSocket(payload)
   }
-  getIp(type) {
-    if (type === 'ipv6' && this.ipv6) {
-      return this.ipv6
-    }
 
-    let ip =
-      this.ip ||
-      (this.ip = !this.closed && this.socket && this.socket.getRemoteAddress())
-
-    if (ip) {
-      if (type === 'ipv6') {
-        if (this.ipv6) {
-          return this.ipv6
-        }
-        let ipv6 = ''
-        new Uint8Array(ip).forEach(
-          (a, i) => (ipv6 += a.toString(16) + (i % 2 && i !== 15 ? ':' : ''))
-        )
-        this.ipv6 = ipv6
-        return ipv6
-      } else if (type) {
-        return Buffer.from(ip).toString(type)
-      } else {
-        return ip
-      }
-    } else {
-      return ''
+  getIp() {
+    if (!this.ip) {
+      this.ip = Buffer.from(this.socket.getRemoteAddressAsText()).toString()
     }
+    return this.ip
   }
+
   sendChannel(payload, msg) {
     if (msg.channel) {
       payload.channel = msg.channel

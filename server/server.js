@@ -192,51 +192,53 @@ const createServer = (
           open,
           close,
           upgrade: (res, req, ctx) => {
-            const url = req.getUrl()
-            const ua = req.getHeader('user-agent')
-            const secWebSocketKey = req.getHeader('sec-websocket-key')
-            const secWebSocketProtocol = req.getHeader('sec-websocket-protocol')
-            const secWebSocketExtensions = req.getHeader(
-              'sec-websocket-extensions'
-            )
-
-            let aborted = false
-            let authorized = false
-
-            res.onAborted(() => {
+            var aborted
+            const onAborted = () => {
               aborted = true
-            })
+            }
 
-            const fn = authorize || (() => Promise.resolve(true))
+            const onAuth = authorized => {
+              if (aborted) {
+                return
+              }
+              if (authorized) {
+                const query = req.getQuery()
+                const url = req.getUrl()
+                const ua = req.getHeader('user-agent')
+                const origin = req.getHeader('origin')
+                const secWebSocketKey = req.getHeader('sec-websocket-key')
+                const secWebSocketProtocol = req.getHeader(
+                  'sec-websocket-protocol'
+                )
+                const secWebSocketExtensions = req.getHeader(
+                  'sec-websocket-extensions'
+                )
 
-            fn(req, ctx)
-              .then(authResult => {
-                authorized = authResult
-              })
-              .catch(e => {
-                console.error(e)
-              })
-              .finally(() => {
-                if (aborted) {
-                  return
-                }
+                res.upgrade(
+                  {
+                    query,
+                    origin,
+                    url,
+                    ua
+                  },
+                  secWebSocketKey,
+                  secWebSocketProtocol,
+                  secWebSocketExtensions,
+                  ctx
+                )
+              } else {
+                res.writeStatus('401 Unauthorized')
+                res.end()
+              }
+            }
 
-                if (authorized) {
-                  res.upgrade(
-                    {
-                      url,
-                      ua
-                    },
-                    secWebSocketKey,
-                    secWebSocketProtocol,
-                    secWebSocketExtensions,
-                    ctx
-                  )
-                } else {
-                  res.writeStatus('401 Unauthorized')
-                  res.end()
-                }
-              })
+            res.onAborted(onAborted)
+
+            if (authorize) {
+              authorize(req, ctx).then(onAuth)
+            } else {
+              onAuth(true)
+            }
           }
         })
         .any('/*', restHandler)
