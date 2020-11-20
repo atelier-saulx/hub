@@ -46,6 +46,7 @@ class Client {
   }
 
   getIp() {
+    // deprecated => getting ip in upgrade header now
     if (!this.ip) {
       this.ip = Buffer.from(this.socket.getRemoteAddressAsText()).toString()
     }

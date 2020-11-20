@@ -205,6 +205,9 @@ const createServer = (
                 const query = req.getQuery()
                 const url = req.getUrl()
                 const ua = req.getHeader('user-agent')
+                const ip =
+                  req.getHeader('x-forwarded-for') ||
+                  Buffer.from(res.getRemoteAddressAsText()).toString()
                 const origin = req.getHeader('origin')
                 const secWebSocketKey = req.getHeader('sec-websocket-key')
                 const secWebSocketProtocol = req.getHeader(
@@ -219,7 +222,8 @@ const createServer = (
                     query,
                     origin,
                     url,
-                    ua
+                    ua,
+                    ip
                   },
                   secWebSocketKey,
                   secWebSocketProtocol,
