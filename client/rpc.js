@@ -112,7 +112,6 @@ const defaultReceive = (hub, props, response) => {
         props.ready(content)
       }
     } else if (type === 'update') {
-      console.log('hello', content)
       let resend
       if (checksum && props.store.checksum) {
         if (props.store !== false) {
