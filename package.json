@@ -12,9 +12,9 @@
     "browser": "aristotle browserTest"
   },
   "browser": {
-    "./client/connection/websocket": "./client/connection/websocket/browser.js",
-    "./client/react/Head": "./client/react/Head/browser.js",
-    "./client/device": "./client/device/browser.js"
+    "./client/connection/websocket/index.js": "./client/connection/websocket/browser.js",
+    "./client/react/Head/index.js": "./client/react/Head/browser.js",
+    "./client/device/index.js": "./client/device/browser.js"
   },
   "main": "./client/index.js",
   "peerDependencies": {

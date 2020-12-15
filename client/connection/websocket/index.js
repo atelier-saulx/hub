@@ -1,6 +1,4 @@
-var WebSocket
-WebSocket = require('ws')
-
+const WebSocket = require('ws')
 const urlLoader = require('./urlLoader')
 
 const maxReconnectionTime = 3000
