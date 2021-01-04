@@ -1,7 +1,7 @@
 {
   "name": "@saulx/hub",
   "description": "Front end state management",
-  "version": "3.7.8",
+  "version": "4.0.0",
   "scripts": {
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
@@ -18,8 +18,8 @@
   },
   "main": "./client/index.js",
   "peerDependencies": {
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   },
   "pre-commit": [
     "format",
@@ -61,9 +61,9 @@
     "eslint-plugin-standard": "^3.0.1",
     "pre-commit": "^1.2.2",
     "prettier": "^1.12.1",
-    "react": "^16.8.0",
-    "react-dom": "^16.8.6",
-    "react-test-renderer": "^16.8.6",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-test-renderer": "^17.0.1",
     "standard": "^10.0.3",
     "deep-object-diff": "^1.1.0"
   },
@@ -76,7 +76,7 @@
     "resolve-from": "^5.0.0",
     "prop-types": "^15.6.1",
     "query-string": "^6.4.2",
-    "react": "^16.8.0",
+    "react": "^17.0.1",
     "vigour-ua": "^4.0.0",
     "ws": "^6.1.2"
   }
