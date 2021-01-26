@@ -1,7 +1,7 @@
 {
   "name": "@saulx/hub",
   "description": "Front end state management",
-  "version": "4.0.0",
+  "version": "4.0.2",
   "scripts": {
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@clusterws/cws": "^3.0.0",
-    "@saulx/aristotle": "1.3.7",
+    "@saulx/aristotle": "^2.4.0",
     "ava": "^2.2.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^7.0.0",
