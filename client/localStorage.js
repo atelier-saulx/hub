@@ -3,13 +3,15 @@ const { format } = require('./format')
 module.exports = (hub, params) => {
   if (typeof window !== 'undefined' && global.localStorage) {
     const props = format(hub, params)
-    const localValue = global.localStorage.getItem(props.hash)
-    if (localValue) {
-      try {
+    let localValue
+
+    try {
+      localValue = global.localStorage.getItem(props.hash)
+      if (localValue) {
         hub.set(props, JSON.parse(localValue))
-      } catch (e) {
-        console.log('error getting from localstorage', e)
       }
+    } catch (e) {
+      console.log('error getting from localstorage', e)
     }
     // want an on setting of every version of this field
     hub.on(props, t => {
@@ -19,6 +21,7 @@ module.exports = (hub, params) => {
         console.log('error setting  localstorage', e)
       }
     })
+
     return localValue
   }
 }
