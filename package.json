@@ -1,7 +1,7 @@
 {
   "name": "@saulx/hub",
   "description": "Front end state management",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "scripts": {
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
@@ -69,7 +69,7 @@
   },
   "dependencies": {
     "@saulx/selva-diff": "^1.0.16",
-    "@saulx/utils": "^1.6.2",
+    "@saulx/utils": "^1.6.6",
     "chalk": "^2.4.2",
     "saulx-murmur": "^0.2.2",
     "path-to-regexp": "^6.1.0",
