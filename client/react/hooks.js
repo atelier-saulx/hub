@@ -38,7 +38,8 @@ const hookFormat = (hub, props, args, hashed) => {
   if (args !== void 0) {
     props.args = args
   }
-  props.hash = hashed || props.hash || hash(props)
+  props.hash =
+    hashed || props.hash || hash([props.endpoint, props.method, props.args])
   config(hub, props)
 
   if (props.on) {
@@ -117,7 +118,7 @@ exports.useData = (subscription, args, defaultValue) => {
           hashed = hash([subscription.endpoint, subscription.method, args])
         }
       } else {
-        hashed = hash(subscription)
+        hashed = hash([subscription.endpoint, subscription.method, undefined])
         if (subscription.range) {
           changedRange = updateRange(hub, subscription, hashed, previous)
         }
