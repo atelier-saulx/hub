@@ -38,7 +38,7 @@ const hookFormat = (hub, props, args, hashed) => {
   if (args !== void 0) {
     props.args = args
   }
-  props.hash = hashed || hash(props)
+  props.hash = hashed || props.hash || hash(props)
   config(hub, props)
 
   if (props.on) {
