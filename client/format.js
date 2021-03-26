@@ -1,7 +1,7 @@
 // only syntax sugar + config reading
 const { getStore } = require('./getStore')
 const fields = ['send', 'call', 'receive', 'args', 'on', 'onChange', 'default']
-const { hash } = require('./hash')
+const { hash } = require('@saulx/utils')
 
 const config = (hub, result) => {
   const config = hub._config
@@ -105,7 +105,7 @@ const format = (hub, props, args, cb, hashed) => {
   }
 
   if (!result.hash) {
-    result.hash = hashed || hash(result)
+    result.hash = hashed || hash([result.endpoint, result.method, result.args])
   }
 
   if (!result.store) {
