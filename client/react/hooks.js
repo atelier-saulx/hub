@@ -6,8 +6,8 @@ const { internalRpc } = require('../rpc')
 const { close } = require('../close')
 const { getLocal } = require('../getLocal')
 const { getStore } = require('../getStore')
-const { hash, argHasher, djb2 } = require('../hash')
 const { Provider: ProviderLegacy } = require('./')
+const { hash } = require('@saulx/utils')
 
 exports.Provider = ({ hub, children }) => {
   return React.createElement(
@@ -112,13 +112,9 @@ exports.useData = (subscription, args, defaultValue) => {
       if (args) {
         if (isString) {
           const split = subscription.split('.')
-          hashed = argHasher(args, djb2(split[0], djb2(split[1]))) >>> 0
+          hashed = hash([split[0], split[1], args])
         } else {
-          hashed =
-            argHasher(
-              args,
-              djb2(subscription.endpoint, djb2(subscription.method))
-            ) >>> 0
+          hashed = hash([subscription.endpoint, subscription.method, args])
         }
       } else {
         hashed = hash(subscription)

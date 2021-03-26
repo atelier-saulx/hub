@@ -18,7 +18,7 @@ const reset = require('./reset')
 const { useHub, useData, Provider, useBehaviour } = require('./react/hooks')
 const extend = require('./extend')
 const localStorage = require('./localStorage')
-const { djb2 } = require('./hash')
+const { hashCompact } = require('@saulx/utils')
 
 var id = 0
 
@@ -28,13 +28,11 @@ class Hub {
     this.id = ++id
     this.store = {}
     this.extensions = {}
-    this.session = (
-      djb2(
-        Date.now() +
-          ~~(Math.random() * 999999999) +
-          (global.navigator ? global.navigator.userAgent : 'app')
-      ) >>> 0
-    ).toString(16)
+    this.session = hashCompact(
+      Date.now() +
+        ~~(Math.random() * 999999999) +
+        (global.navigator ? global.navigator.userAgent : 'app')
+    )
     device(this, config)
     if (config) {
       configure(this, config)
