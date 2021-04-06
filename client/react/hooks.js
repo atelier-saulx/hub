@@ -113,12 +113,20 @@ exports.useData = (subscription, args, defaultValue) => {
       if (args) {
         if (isString) {
           const split = subscription.split('.')
-          hashed = hash([split[0], split[1], args])
+          hashed = hash([split[0], split[1], subscription.args])
         } else {
-          hashed = hash([subscription.endpoint, subscription.method, args])
+          hashed = hash([
+            subscription.endpoint,
+            subscription.method,
+            subscription.args
+          ])
         }
       } else {
-        hashed = hash([subscription.endpoint, subscription.method, undefined])
+        hashed = hash([
+          subscription.endpoint,
+          subscription.method,
+          subscription.args
+        ])
         if (subscription.range) {
           changedRange = updateRange(hub, subscription, hashed, previous)
         }
