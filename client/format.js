@@ -1,7 +1,7 @@
 // only syntax sugar + config reading
 const { getStore } = require('./getStore')
 const fields = ['send', 'call', 'receive', 'args', 'on', 'onChange', 'default']
-const { hash } = require('@saulx/utils')
+const { hash } = require('@saulx/hash')
 
 const config = (hub, result) => {
   const config = hub._config

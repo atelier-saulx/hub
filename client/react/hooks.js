@@ -7,7 +7,7 @@ const { close } = require('../close')
 const { getLocal } = require('../getLocal')
 const { getStore } = require('../getStore')
 const { Provider: ProviderLegacy } = require('./')
-const { hash } = require('@saulx/utils')
+const { hash } = require('@saulx/hash')
 
 exports.Provider = ({ hub, children }) => {
   return React.createElement(

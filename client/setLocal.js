@@ -1,5 +1,5 @@
 const { emit, emitImmediate } = require('./emit')
-const diff = require('@saulx/selva-diff')
+const diff = require('@saulx/diff')
 const { deepNotEqual, mergeObj } = require('./util')
 
 const applyDiffPatch = diff.applyPatch

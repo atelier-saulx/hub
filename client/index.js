@@ -18,7 +18,7 @@ const reset = require('./reset')
 const { useHub, useData, Provider, useBehaviour } = require('./react/hooks')
 const extend = require('./extend')
 const localStorage = require('./localStorage')
-const { hashCompact } = require('@saulx/utils')
+const { hashCompact } = require('@saulx/hash')
 
 var id = 0
 
