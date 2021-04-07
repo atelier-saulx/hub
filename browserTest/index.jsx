@@ -1,5 +1,12 @@
 import React, { useReducer, useEffect, useRef, useState } from 'react'
-import { createClient, useRpc, Provider, useHub, connect } from '../client'
+import {
+  createClient,
+  useRpc,
+  Provider,
+  useHub,
+  connect,
+  useData
+} from '../client'
 import ReactDOM from 'react-dom'
 
 const hub = createClient({
@@ -40,6 +47,24 @@ hub.configure({
 // })
 
 const Flap = connect(({ data, hub }) => {
+  console.log('go')
+
+  const d = useData('device.snurk', {
+    x: true,
+    y: true
+  })
+
+  const dx = useData('device.snurk', {
+    x: true,
+    z: true
+  })
+
+  const dxy = useData({
+    endpoint: 'device',
+    method: 'snurk',
+    args: { x: true, z: true }
+  })
+
   return (
     <div
       onClick={() => {

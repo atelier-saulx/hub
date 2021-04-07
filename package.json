@@ -1,7 +1,7 @@
 {
   "name": "@saulx/hub",
   "description": "Front end state management",
-  "version": "4.0.12",
+  "version": "4.0.13",
   "scripts": {
     "format": "prettier --write '{lib,test}/**/*.{js,json}'",
     "lint": "eslint '{lib,test}/**/*.js' --fix",
@@ -9,7 +9,7 @@
     "watch": "ava --verbose --watch",
     "update-test": "ava --update-snapshots",
     "browser-server": "nodemon browserTest/hubServer",
-    "browser": "aristotle browserTest"
+    "browser": "aristotle watch -t browserTest/index.jsx"
   },
   "browser": {
     "./client/connection/websocket/index.js": "./client/connection/websocket/browser.js",
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@saulx/utils": "^2.0.1",
     "@clusterws/cws": "^3.0.0",
-    "@saulx/aristotle": "^2.4.0",
+    "@saulx/aristotle": "^3.0.16",
     "ava": "^2.2.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^7.0.0",

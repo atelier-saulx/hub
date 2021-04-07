@@ -16,7 +16,7 @@ test('hooks api', t => {
     return hub.get('device.bla')
   }
 
-  // console.log('cannot test useEffect so hard to rest useRpc')
+  // console.log('cannot test useEffect so hard to test useRpc')
   const Thing2 = () => {
     const hub = useHub()
     return hub.get('device.bla')
