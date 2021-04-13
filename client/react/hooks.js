@@ -42,8 +42,6 @@ const hookFormat = (hub, props, args, hashed) => {
     hashed || props.hash || hash([props.endpoint, props.method, props.args])
   config(hub, props)
 
-  console.log(props, hashed, props.hash)
-
   if (props.on) {
     // can become preparsed from config
     props._onParsed = props.on.map(val => format(hub, val))
