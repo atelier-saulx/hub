@@ -1,6 +1,5 @@
-const murmur = require('saulx-murmur').murmurHash
 const { createPatch } = require('@saulx/diff')
-const { hashObject } = require('@saulx/hash')
+const { hashObject, hash } = require('@saulx/hash')
 
 const sliceRange = (data, msg, force) => {
   const receivedRange = msg.receivedRange
@@ -123,7 +122,7 @@ class Endpoint {
     return changed
   }
   generateChecksum(obj) {
-    return murmur(obj)
+    return hash(obj)
   }
   sendError(error, client, msg) {
     client.sendChannel({ error }, msg, this)
