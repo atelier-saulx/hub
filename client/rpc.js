@@ -147,8 +147,6 @@ const defaultReceive = (hub, props, response) => {
           if (checksum) props.store.checksum = checksum
           const changedContent = true // checksum !== props.store.checksum
 
-          console.log(content)
-
           // if range is the same
 
           if (props.range && response.range) {
