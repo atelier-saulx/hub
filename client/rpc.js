@@ -147,6 +147,10 @@ const defaultReceive = (hub, props, response) => {
           if (checksum) props.store.checksum = checksum
           const changedContent = true // checksum !== props.store.checksum
 
+          console.log(content)
+
+          // if range is the same
+
           if (props.range && response.range) {
             if (response.range[1] < props.range[1]) {
               props.store.receivedLast = true
@@ -171,18 +175,37 @@ const defaultReceive = (hub, props, response) => {
                   prev.push(content[i])
                 }
               }
+
               if (changedContent) {
-                update = true
-                const start = rr[0] - range[0]
-                const len =
-                  range[1] + 1 > rr[1] ? rr[1] - range[0] : content.length
-                if (start < 0) {
-                  for (let i = 0; i < len; i++) {
-                    prev[i - start] = content[i]
+                if (
+                  response.range[1] < props.range[1] &&
+                  response.range[0] === props.range[0] &&
+                  prev
+                ) {
+                  // need to find if the same... blurf
+                  // this needs to be refactored with using diff much better
+
+                  for (let i = props.range[0]; i < props.range[1]; i++) {
+                    if (content[i]) {
+                      prev[i] = content[i]
+                    } else {
+                      prev.splice(i, 1)
+                    }
                   }
+                  update = true
                 } else {
-                  for (let i = start; i < len; i++) {
-                    prev[i] = content[i]
+                  update = true
+                  const start = rr[0] - range[0]
+                  const len =
+                    range[1] + 1 > rr[1] ? rr[1] - range[0] : content.length
+                  if (start < 0) {
+                    for (let i = 0; i < len; i++) {
+                      prev[i - start] = content[i]
+                    }
+                  } else {
+                    for (let i = start; i < len; i++) {
+                      prev[i] = content[i]
+                    }
                   }
                 }
               }

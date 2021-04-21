@@ -1,12 +1,5 @@
 import React, { useReducer, useEffect, useRef, useState } from 'react'
-import {
-  createClient,
-  useRpc,
-  Provider,
-  useHub,
-  connect,
-  useData
-} from '../client'
+import { createClient, Provider, useHub, connect, useData } from '../client'
 import ReactDOM from 'react-dom'
 
 const hub = createClient({
@@ -18,24 +11,9 @@ hub.debug = true
 hub.configure({
   global: {
     incoming: (hub, payload) => {
-      console.log('11111x')
       return payload
     },
     send: (hub, payload) => {
-      console.log('1111y')
-      return payload
-    }
-  }
-})
-
-hub.configure({
-  global: {
-    incoming: (hub, payload) => {
-      console.log('2222x')
-      return payload
-    },
-    send: (hub, payload) => {
-      console.log('222y')
       return payload
     }
   }
@@ -46,23 +24,13 @@ hub.configure({
 //   console.log(hub.get('data.diff'))
 // })
 
-const Flap = connect(({ data, hub }) => {
-  console.log('go')
+// need to test range with delete
 
-  const d = useData('device.snurk', {
-    x: true,
-    y: true
-  })
-
-  const dx = useData('device.snurk', {
-    x: true,
-    z: true
-  })
-
-  const dxy = useData({
-    endpoint: 'device',
-    method: 'snurk',
-    args: { x: true, z: true }
+const Flap = ({ data, hub }) => {
+  const list = useData({
+    endpoint: 'data',
+    method: 'list',
+    range: [0, 10]
   })
 
   return (
@@ -72,9 +40,18 @@ const Flap = connect(({ data, hub }) => {
       }}
     >
       {data ? 'flap' : 'no flap'}
+      {list
+        ? list.map((v, i) => {
+            return (
+              <div key={i}>
+                {v.realIndex} {v.emoji}
+              </div>
+            )
+          })
+        : null}
     </div>
   )
-}, 'data.simple')
+}
 
 const App = () => {
   return (
