@@ -12,7 +12,8 @@ const createServer = (
   key,
   cert,
   debug,
-  json
+  json,
+  useLessMemory
 ) =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -40,7 +41,8 @@ const createServer = (
         key && cert
           ? uws.SSLApp({
               key_file_name: key,
-              cert_file_name: cert
+              cert_file_name: cert,
+              ssl_prefer_low_memory_usage: useLessMemory,
             })
           : uws.App()
 
@@ -49,7 +51,7 @@ const createServer = (
 
       if (json) {
         if (json === true) {
-          json = parsed => {
+          json = (parsed) => {
             console.log(parsed)
             return true
           }
@@ -74,7 +76,7 @@ const createServer = (
                   args,
                   method,
                   seq: 1,
-                  noSubscription: true
+                  noSubscription: true,
                 }
 
                 if (json(msg)) {
@@ -82,9 +84,9 @@ const createServer = (
                     getRemoteAddress: () => {
                       return res.getRemoteAddress()
                     },
-                    send: reply => {
+                    send: (reply) => {
                       res.end(reply)
-                    }
+                    },
                   }
                   const client = new Client(s)
                   if (ua) {
@@ -110,7 +112,7 @@ const createServer = (
           }
         }
       } else {
-        restHandler = res => {
+        restHandler = (res) => {
           res.end(version)
         }
       }
@@ -146,7 +148,7 @@ const createServer = (
         }
         if (messages) {
           if (Array.isArray(messages)) {
-            messages.forEach(msg => {
+            messages.forEach((msg) => {
               if (typeof msg === 'object') {
                 if (
                   msg.endpoint === 'channel' &&
@@ -162,7 +164,7 @@ const createServer = (
         }
       }
 
-      const open = socket => {
+      const open = (socket) => {
         const client = new Client(socket)
         socket.client = client
         if (onConnection) {
@@ -170,7 +172,7 @@ const createServer = (
         }
       }
 
-      const close = socket => {
+      const close = (socket) => {
         if (socket.client) {
           socket.client.socket = null
           socket.client.closed = true
@@ -197,7 +199,7 @@ const createServer = (
               aborted = true
             }
 
-            const onAuth = authorized => {
+            const onAuth = (authorized) => {
               if (aborted) {
                 return
               }
@@ -223,7 +225,7 @@ const createServer = (
                     origin,
                     url,
                     ua,
-                    ip
+                    ip,
                   },
                   secWebSocketKey,
                   secWebSocketProtocol,
@@ -243,10 +245,10 @@ const createServer = (
             } else {
               onAuth(true)
             }
-          }
+          },
         })
         .any('/*', restHandler)
-        .listen(port, listenSocket => {
+        .listen(port, (listenSocket) => {
           if (listenSocket) {
             console.log('💫  hub-server listening on port:', port)
             resolve(listenSocket)
