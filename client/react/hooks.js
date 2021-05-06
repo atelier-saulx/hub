@@ -89,7 +89,12 @@ exports.useBehaviour = (behaviour, key) => {
 const isNode = typeof window === 'undefined'
 
 // var cnt = 0
-exports.useData = (subscription, args, defaultValue) => {
+exports.useData = (
+  subscription,
+  args,
+  defaultValue,
+  customHook = useEffect
+) => {
   const hub = useContext(HubContext)
   let [result, update] = useState({})
   const ref = useRef({ parsed: false, range: false, id: false })
@@ -152,7 +157,7 @@ exports.useData = (subscription, args, defaultValue) => {
     previous.id = subscription
   }
   if (!isNode) {
-    useEffect(() => {
+    customHook(() => {
       if (subscription) {
         if (!parsed) parsed = hookFormat(hub, subscription, args, hashed)
         previous.parsed = parsed
